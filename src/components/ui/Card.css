@@ -1,18 +1,134 @@
+/* Card container */
 .card-container {
-    background-color: #ffffff;
-    width: 300px;
-    height: 300px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px; /* Bord arrondi */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombre légère */
-    padding: 10px;
-  }
-  
-  .card-image {
-    width: 80%;
-    height: auto;
-    object-fit: contain;
-  }
-  
+  background: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+  cursor: pointer;
+}
+
+.card-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Image section */
+.img-wrapper {
+  position: relative;
+  overflow: hidden;
+  height: 250px;
+  background-color: #F5F5F5;
+}
+
+.product-img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+  margin-top: 10px;
+}
+
+/* Favorite icon */
+.favorit {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  color: #000000;
+  font-size: 1.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 2;
+}
+
+.favorit:hover {
+  color: #ff0000;
+}
+
+.favorit.liked {
+  color: #ff0000 !important;
+}
+
+/* Add to cart button */
+.add-to-cart {
+  position: absolute;
+  bottom: -50px;
+  left: 0;
+  right: 0; 
+  background: #000000;
+  color: white;
+  padding: 0.8rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  z-index: 2;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+}
+
+.card-container:hover .add-to-cart {
+  bottom: 0;
+}
+
+.add-to-cart p {
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+
+.product-description {
+  padding: 1.5rem;
+}
+
+.product-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 0.5rem;
+}
+
+.price-rating {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.price-card {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #007BFF;
+  margin: 0;
+}
+
+
+
+.star-container {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin: auto 0;
+}
+
+.star-container p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #636e72;
+  margin-left: 0.3rem;
+}
+
+/* Star icon styling */
+.star-container svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: #ffd700;
+}
+
+.star-container svg[data-empty] {
+  fill: #e0e0e0;
+}
