@@ -1,7 +1,9 @@
 /* assets/styles/global.css */
 :root {
-    --primary-color: #2c3e50;
-    --secondary-color: #ecf0f1;
+  --primary-color: #2A254B;
+  --secondary-color: #4E4D93;
+  --accent-color: #007BFF;
+  --light-bg: #F9F9F9;
   }
   
   body {
@@ -13,4 +15,13 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
+  }
+
+
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
   }
