@@ -1,0 +1,18 @@
+.card-container {
+    background-color: #ffffff;
+    width: 300px;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px; /* Bord arrondi */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombre légère */
+    padding: 10px;
+  }
+  
+  .card-image {
+    width: 80%;
+    height: auto;
+    object-fit: contain;
+  }
+  
