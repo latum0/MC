@@ -1,0 +1,136 @@
+/* Header.css */
+.nav-container {
+  display: flex;
+  align-items: flex-end;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background-color: white;
+  z-index: 1000;
+  box-sizing: border-box;
+  border-bottom: 1px solid rgb(219, 219, 219);
+  padding: 1rem 0;
+  padding-bottom: 0;
+  margin-bottom: 0;
+  
+}
+
+.navbar {
+  margin: 0 auto;
+  max-width: 1350px;
+  
+  
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2rem;
+  padding-top: 20px;
+  padding-bottom: 15px;
+  width: 85vw;
+}
+
+/* Logo */
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.logoText {
+  color: black;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+/* Navigation Links */
+.navbar-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.navbar-links a {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  font-size: 1.1rem;
+  transition: color 0.3s ease-in-out;
+}
+
+.lineUnder {
+  width: 100%;
+  border-bottom: 1px solid #9b9b9b;
+}
+
+.navbar-links a:hover {
+  color: #007BFF;
+}
+
+.navbar-links a.active {
+  border-bottom: 2px solid currentColor;
+}
+
+/* Right Section (Search + Icons) */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* Search bar */
+.input-div {
+  display: flex;
+  align-items: center;
+  background-color: rgb(230, 230, 230);
+  border-radius: 5px;
+  padding: 5px;
+  padding-left: 20px;
+  transition: box-shadow 0.3s ease-in-out;
+
+}
+
+.input-div:focus-within {
+  
+}
+
+.navbar-search {
+  border: none;
+  outline: none;
+  padding: 0.5rem;
+  width: 250px;
+  font-size: 1rem;
+  background: none;
+}
+
+.navbar-search::placeholder {
+  color: gray;
+  font-style: italic;
+}
+
+/* Icons */
+.fav-logo, .cart-logo {
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out;
+  
+}
+
+.fav-logo:hover, .cart-logo:hover {
+  transform: scale(1.1);
+}
+
+/* Search icon */
+.input-div img {
+  width: 20px;
+  height: 20px;
+  margin: 0 4px;
+}
+
+.logo-img {
+  width: 200px;
+  height: 30px;
+}

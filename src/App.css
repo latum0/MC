@@ -176,6 +176,7 @@
   border-radius: 8px;
 }
 
+<<<<<<< HEAD
 /* Carousel Indicators */
 .carousel-indicators {
   display: flex;
@@ -218,3 +219,10 @@
   color: #0c0c0c;
   margin-bottom: 10px;
 }
+=======
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+>>>>>>> db256295e5c4962a0b55daab6f0610d10fda96a6

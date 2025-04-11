@@ -1,3 +1,4 @@
+
 import { Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
 import About from './pages/About'
@@ -14,6 +15,7 @@ function App() {
             <Route path="/Found" element={<Found />} />
         </Routes>
     )
+
 }
 
 export default App
