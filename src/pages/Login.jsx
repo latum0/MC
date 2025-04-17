@@ -1,45 +1,32 @@
-import React, { useState } from 'react';
-import './Login.css';
+import React from "react";
+import "./Login.css";
+import CardImage from "../components/ui/cardimage";
+import FormContainer from "../components/ui/FormContainer";
 
-function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+import Header from '../components/ui/Header';
+import Footer from '../components/ui/Footer'
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Handle login logic here
-    console.log('Email:', email, 'Password:', password);
-  };
-
+export default function Login() {
   return (
-    <div className="login-container">
-      <h2>Log in to Exclusive</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="email">Email or Phone Number</label>
-          <input
-            type="text"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
+    <>
+      
+      <div className="container slide-page-right">
+        <div className="card">
+          <CardImage />
+          <FormContainer
+            title="Welcome Back"
+            subtitle="Please log in to your account"
+            showNameInput={false}
+            buttonText="Log In"
+            linkText="Don't have an account?"
+            linkUrl="/signup"
+            linkLabel="Sign up"
           />
         </div>
-        <div className="form-group">
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Log In</button>
-        <a href="#forgot-password">Forget Password?</a>
-      </form>
-    </div>
+      </div>
+     
+
+     
+    </>
   );
 }
-
-export default Login;

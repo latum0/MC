@@ -2,8 +2,8 @@ import React, { useState, useRef } from 'react';
 import './Header.css'; 
 import { MdFavoriteBorder } from "react-icons/md";
 import { MdOutlineShoppingCart } from "react-icons/md";
-import { Navigate, useNavigate } from 'react-router-dom';
-
+import { MdAccountCircle } from "react-icons/md"; 
+import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
   const [links, setLinks] = useState({
@@ -13,29 +13,39 @@ const Header = () => {
     signup: false,
   });
   const navigate = useNavigate();
-  const homeHandler = ()=>{
-    navigate(`/`)
-  }
-
-
   const inputRef = useRef(null);
 
+  const homeHandler = () => {
+    navigate('/');
+    setLinks({
+      home: true,
+      about: false,
+      contact: false,
+      signup: false
+    });
+  };
+
   const linkNavbar = (e, name) => {
-    e.preventDefault(); 
+    e.preventDefault();
     setLinks({
       home: name === 'home',
       about: name === 'about',
       contact: name === 'contact',
       signup: name === 'signup',
     });
+
+    if (name === 'signup') {
+      navigate('/login');
+    } else {
+      navigate(`/${name === 'home' ? '' : name}`);
+    }
   };
 
   return (
     <div className="nav-container">
       <header className="navbar">
         <div className="navbar-logo" onClick={homeHandler}>
-           <img src="src/assets/logoMC.png" alt="Logo" className="logo-img" /> 
-          
+          <img src="src/assets/logoMC.png" alt="Logo" className="logo-img" /> 
         </div>
 
         <nav className="navbar-links">
@@ -48,13 +58,13 @@ const Header = () => {
           <a href="/contact" onClick={(e) => linkNavbar(e, 'contact')}>
             Contact {links.contact && <div className="lineUnder"></div>}
           </a>
-          <a href="/signup" onClick={(e) => linkNavbar(e, 'signup')}>
+          <a href="/login" onClick={(e) => linkNavbar(e, 'signup')}>
             Sign Up {links.signup && <div className="lineUnder"></div>}
           </a>
         </nav>
 
         <div className="navbar-right">
-          <div className="input-div" >
+          <div className="input-div">
             <input
               type="text"
               placeholder="Que cherchez-vous ?"
@@ -65,6 +75,7 @@ const Header = () => {
           </div>
           <MdFavoriteBorder className="fav-logo" />
           <MdOutlineShoppingCart className="cart-logo" />
+          {/*<MdAccountCircle className="profile-logo" />*/}
         </div>
       </header>
     </div>
