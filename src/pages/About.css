@@ -1,9 +1,10 @@
 /* Global Styles */
 .container {
     font-family: Arial, sans-serif;
+    max-width: 1000px;
+    margin: 0 auto;
     padding: 20px;
-    background: white;
-    color: black;
+    color: #000;
 }
 
 /* Navigation Bar */

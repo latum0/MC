@@ -5,9 +5,6 @@ import photo2 from '../assets/m.png';
 import emma from '../assets/emma.png';
 import will from '../assets/will.png';
 import tom from '../assets/tom.png';
-import m1 from '../assets/m1.png';
-import c from '../assets/c.png';
-import u from '../assets/u.png';
 import t1 from '../assets/t1.png';
 import m10 from '../assets/m10.png';
 import m2 from '../assets/m2.png';
@@ -15,38 +12,10 @@ import m4 from '../assets/m4.png';
 import m5 from '../assets/m5.png';
 import m6 from '../assets/m6.png';
 import m7 from '../assets/m7.png';
-import logo_v2 from '../assets/logo_v2.webp';
 export default function About() {
     return (
         <div className="container">
-
-            <nav className="navbar">
-                <div className="logo-container">
-                    <img src={logo_v2} alt="SKILL MARKET Logo" className="nav-logo" />
-                </div>
-                <div className="nav-links">
-                    <Link to="/" className="nav-link">Home</Link>
-                    <Link to="/contact" className="nav-link">Contact</Link>
-                    <Link to="/about" className="nav-link active">About</Link>
-                    <Link to="/about" className="nav-link ">Sign Up</Link>
-                </div>
-                <div className="search-bar">
-                    <input type="text" placeholder="What are you looking for?" />
-                </div>
-                <div className="nav-icons">
-                    <button className="icon-button">
-                        <img src={c} className="about-image" />
-                    </button>
-                    <button className="icon-button">
-                        <img src={m1} />
-                    </button>
-                    <button className="icon-button">
-                        <img src={u} />
-                    </button>
-                </div>
-            </nav>
-
-
+            <div className="exclusive-contact" style={{ paddingTop: '50px' }}></div>
             <div className="breadcrumb">
                 <span style={{ color: '#aaa' }}>Home</span> / <span className="active">About</span>
             </div>
