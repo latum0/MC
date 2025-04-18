@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* Global Styles */
 .container {
   font-family: Arial, sans-serif;
@@ -174,6 +175,14 @@
   height: 200px;
   object-fit: cover;
   border-radius: 8px;
+=======
+.App {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f4f4f4;
+>>>>>>> 97fae3ca88f5350a104ef203f8b1158465f0bcf6
 }
 
 <<<<<<< HEAD
