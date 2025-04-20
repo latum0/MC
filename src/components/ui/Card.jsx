@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Card.css';
 import StarEx from './starEx';
@@ -9,34 +9,82 @@ function Card(props) {
   const [isAdded, setIsAdded] = useState(false);
   const navigate = useNavigate();
 
-  const handleLike = () => {
+  // Check cart status on component mount and product ID change
+  useEffect(() => {
+    const checkCartStatus = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/cart');
+        if (!response.ok) return;
+        
+        const cart = await response.json();
+        const isInCart = cart?.items?.some(item => 
+          item.product._id === props.id
+        );
+        setIsAdded(isInCart);
+      } catch (err) {
+        console.error('Error checking cart status:', err);
+      }
+    };
+
+    checkCartStatus();
+  }, [props.id]);
+
+  const handleLike = (e) => {
+    e.stopPropagation();
     setIsLiked(!isLiked);
   };
 
-  const handleAdd = (e) => {
+  const handleAddToCart = async (e) => {
     e.stopPropagation();
-    setIsAdded(!isAdded);
+    try {
+      const response = await fetch('http://localhost:5000/api/cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId: props.id,
+          quantity: 1
+        })
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to add to cart');
+      }
+
+      // Update local state after successful addition
+      setIsAdded(true);
+
+    } catch (err) {
+      console.error('Add to cart error:', err.message);
+      alert(`Error: ${err.message}`);
+    }
   };
 
   const handleCardClick = () => {
-    
     navigate(`/products/${props.id}`);
   };
 
   return (
     <div className="card-container" onClick={handleCardClick}>
       <div className="img-wrapper">
-        <img src={props.img} alt={props.name} className="product-img" />
+        {/* Use the img prop for the image source */}
+        <img 
+          src={props.img} 
+          alt={props.name} 
+          className="product-img" 
+        />
         <MdFavoriteBorder 
           className={`favorit ${isLiked ? 'liked' : ''}`}
-          onClick={(e) => {
-            e.stopPropagation();
-            handleLike();
-          }}
+          onClick={handleLike}
           aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}
         />
-        <button className="add-to-cart" onClick={handleAdd}>
-          { isAdded ? "✓" : 'Add To Cart'}
+        <button 
+          className={`add-to-cart ${isAdded ? 'added' : ''}`}
+          onClick={handleAddToCart}
+          disabled={isAdded}
+        >
+          {isAdded ? "✓ In Cart" : 'Add To Cart'}
         </button>
       </div>
 
