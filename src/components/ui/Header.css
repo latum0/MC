@@ -146,16 +146,14 @@
 }
 
 /* Icons */
-.fav-logo,
-.cart-logo {
+.fav-logo, .cart-logo ,.profile-logo {
   width: 32px;
   height: 32px;
   cursor: pointer;
   transition: transform 0.3s ease-in-out;
 }
 
-.fav-logo:hover,
-.cart-logo:hover {
+.fav-logo:hover, .cart-logo:hover ,.profile-logo:hover {
   transform: scale(1.1);
 }
 

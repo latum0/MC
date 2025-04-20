@@ -2,6 +2,10 @@ import React, { useState, useRef } from 'react';
 import './Header.css';
 import { MdFavoriteBorder } from "react-icons/md";
 import { MdOutlineShoppingCart } from "react-icons/md";
+<<<<<<< HEAD
+=======
+import { MdAccountCircle } from "react-icons/md"; 
+>>>>>>> 97fae3ca88f5350a104ef203f8b1158465f0bcf6
 import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
@@ -16,12 +20,25 @@ const Header = () => {
   const navigate = useNavigate();
   const inputRef = useRef(null);
 
+<<<<<<< HEAD
   // Function to handle navigation to Home
   const homeHandler = () => {
     navigate(`/`);
   };
 
   // Function to handle link clicks
+=======
+  const homeHandler = () => {
+    navigate('/');
+    setLinks({
+      home: true,
+      about: false,
+      contact: false,
+      signup: false
+    });
+  };
+
+>>>>>>> 97fae3ca88f5350a104ef203f8b1158465f0bcf6
   const linkNavbar = (e, name) => {
     e.preventDefault();
     setLinks({
@@ -30,6 +47,12 @@ const Header = () => {
       contact: name === 'contact',
       signup: name === 'signup',
     });
+
+    if (name === 'signup') {
+      navigate('/login');
+    } else {
+      navigate(`/${name === 'home' ? '' : name}`);
+    }
   };
 
   // Fetch recommendations based on the query
@@ -75,7 +98,11 @@ const Header = () => {
       <header className="navbar">
         {/* Logo */}
         <div className="navbar-logo" onClick={homeHandler}>
+<<<<<<< HEAD
           <img src="src/assets/logoMC.png" alt="Logo" className="logo-img" />
+=======
+          <img src="src/assets/logoMC.png" alt="Logo" className="logo-img" /> 
+>>>>>>> 97fae3ca88f5350a104ef203f8b1158465f0bcf6
         </div>
 
         {/* Navigation Links */}
@@ -89,13 +116,14 @@ const Header = () => {
           <a href="/contact" onClick={(e) => linkNavbar(e, 'contact')}>
             Contact {links.contact && <div className="lineUnder"></div>}
           </a>
-          <a href="/signup" onClick={(e) => linkNavbar(e, 'signup')}>
+          <a href="/login" onClick={(e) => linkNavbar(e, 'signup')}>
             Sign Up {links.signup && <div className="lineUnder"></div>}
           </a>
         </nav>
 
         {/* Search and Icons */}
         <div className="navbar-right">
+<<<<<<< HEAD
           {/* Search Input */}
           <div className="input-div">
             <form onSubmit={handleSearch} className="search-form">
@@ -126,11 +154,22 @@ const Header = () => {
                 ))}
               </ul>
             )}
+=======
+          <div className="input-div">
+            <input
+              type="text"
+              placeholder="Que cherchez-vous ?"
+              className="navbar-search"
+              ref={inputRef}
+            />
+            <img src="src/assets/search.png" alt="search" />
+>>>>>>> 97fae3ca88f5350a104ef203f8b1158465f0bcf6
           </div>
 
           {/* Favorite and Cart Icons */}
           <MdFavoriteBorder className="fav-logo" />
           <MdOutlineShoppingCart className="cart-logo" />
+          {/*<MdAccountCircle className="profile-logo" />*/}
         </div>
       </header>
     </div>
