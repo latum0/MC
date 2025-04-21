@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /* Global Styles */
 .container {
   font-family: Arial, sans-serif;
@@ -175,17 +174,18 @@
   height: 200px;
   object-fit: cover;
   border-radius: 8px;
-=======
+}
+
 .App {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   background-color: #f4f4f4;
->>>>>>> 97fae3ca88f5350a104ef203f8b1158465f0bcf6
+
 }
 
-<<<<<<< HEAD
+
 /* Carousel Indicators */
 .carousel-indicators {
   display: flex;
@@ -228,10 +228,9 @@
   color: #0c0c0c;
   margin-bottom: 10px;
 }
-=======
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
->>>>>>> db256295e5c4962a0b55daab6f0610d10fda96a6

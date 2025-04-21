@@ -14,7 +14,7 @@ const Contact = () => {
 
             <div className="exclusive-contact" style={{ paddingTop: '50px' }}></div>
             <div className="breadcrumb">
-                <span style={{ color: '#aaa' }}>Home</span> / <span className="active">Contact</span>
+                <Link to="/" style={{ color: '#aaa' }}>Home</Link> / <span className="active">Contact</span>
             </div>
 
             <div className="contact-container">

@@ -5,6 +5,9 @@ import Home from './pages/Home'
 import Product from './pages/Product'
 import About from './pages/About'
 import Contact from './pages/Contact'
+import Signup from './pages/Signup'
+import Login from './pages/Login'
+import ResetPassword from './pages/ResetPassword'
 import Header from './components/ui/Header'
 import Footer from './components/ui/Footer'
 
@@ -19,6 +22,9 @@ function App() {
         <Route path="/products/:productId" element={<Product />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
       <Footer />
     </Router>

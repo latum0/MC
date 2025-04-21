@@ -12,109 +12,105 @@ import m4 from '../assets/m4.png';
 import m5 from '../assets/m5.png';
 import m6 from '../assets/m6.png';
 import m7 from '../assets/m7.png';
+
 export default function About() {
     return (
-        <div className="container">
-            <div className="exclusive-contact" style={{ paddingTop: '50px' }}></div>
+        <div className="about-container">
+            <div className="exclusive-contact" style={{ paddingTop: '80px' }}></div>
             <div className="breadcrumb">
-                <span style={{ color: '#aaa' }}>Home</span> / <span className="active">About</span>
+                <Link to="/" style={{ color: '#aaa' }}>Home</Link> / <span className="active">About</span>
             </div>
 
-            <div className="about-section" style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
-
-                <div className="text" style={{ flex: 1, textAlign: 'left' }}>
-                    <h1 className="title">Our Story</h1>
+            <section className="about-section">
+                <div className="about-content">
+                    <h1 className="about-title">Our Story</h1>
                     <p>
-                        Launched in 2015, Exclusive is South Asia’s premier online shopping
-                        marketplace with an active presence in Bangladesh. Supported by a
-                        wide range of tailored marketing, data and service solutions,
-                        Exclusive has 10,500 sellers and 300 brands and serves 3 million
-                        customers across the region.
+                        Launched in 2025, Skill Market is the first e-commerce platform specialized in PC equipment with an active presence across Africa. Powered by advanced customization and recommendation technologies, Skill Market offers over 15,000 products from 500 different brands and serves more than 2 million tech and gaming enthusiasts.
                     </p>
                     <p>
-                        Exclusive has more than 1 Million products to offer, growing at a
-                        very fast. Exclusive offers a diverse assortment in categories
-                        ranging from consumer.
+                        Skill Market offers a diverse range of products covering all computing needs—from high-performance components to gaming peripherals—constantly evolving to keep up with the latest innovations. Our platform allows users to customize PCs, compare technical specifications, and benefit from expert advice to optimize their purchases across all categories, from graphics cards to advanced cooling systems.
                     </p>
                 </div>
 
-
-                <div className="image" style={{ flexShrink: 0 }}>
+                <div className="about-image-container">
                     <img
                         src={photo2}
                         alt="Shopping Girls"
-                        className="about-image"
-                        style={{ width: '350px', height: 'auto', borderRadius: '8px' }}
+                        className="about-main-image"
                     />
                 </div>
-            </div>
+            </section>
 
-            <div className="statistics">
-                <div className="stat">
-                    <img src={t1} alt="Sales" className="sm-stat-icon" />
+            <section className="stats-section">
+                <div className="stat-card">
+                    <img src={t1} alt="Sellers icon" className="stat-icon" />
                     <h2>10.5k</h2>
                     <p>Sellers active in our site</p>
                 </div>
-                <div className="stat highlight">
-                    <img src={m10} alt="Sales" className="sm-stat-icon" />
+                <div className="stat-card highlight">
+                    <img src={m10} alt="Sales icon" className="stat-icon" />
                     <h2>33k</h2>
                     <p>Monthly Product Sale</p>
                 </div>
-                <div className="stat">
-                    <img src={m2} alt="Sales" className="sm-stat-icon" />
+                <div className="stat-card">
+                    <img src={m2} alt="Customers icon" className="stat-icon" />
                     <h2>45.5k</h2>
                     <p>Customer active in our site</p>
                 </div>
-                <div className="stat">
-                    <img src={m4} alt="Sales" className="sm-stat-icon" />
+                <div className="stat-card">
+                    <img src={m4} alt="Gross sale icon" className="stat-icon" />
                     <h2>25k</h2>
                     <p>Annual gross sale in our site</p>
                 </div>
-            </div>
+            </section>
 
+            <section className="team-section">
+                <h2 className="section-title">Our Team</h2>
+                <div className="team-grid">
+                    <div className="team-member">
+                        <img src={tom} alt="Tom Cruise" className="member-photo" />
+                        <h3>Tom Cruise</h3>
+                        <p>Founder & Chairman</p>
+                    </div>
+                    <div className="team-member">
+                        <img src={emma} alt="Emma Watson" className="member-photo" />
+                        <h3>Emma Watson</h3>
+                        <p>Managing Director</p>
+                    </div>
+                    <div className="team-member">
+                        <img src={will} alt="Will Smith" className="member-photo" />
+                        <h3>Will Smith</h3>
+                        <p>Product Designer</p>
+                    </div>
+                </div>
+            </section>
 
-            <div className="team">
-                <div className="team-member">
-                    <img src={tom} alt="Tom Cruise" className="about-image" />
-                    <h3>Tom Cruise</h3>
-                    <p>Founder & Chairman</p>
-                </div>
-                <div className="team-member">
-                    <img src={emma} alt="Emma Watson" className="about-image" />
-                    <h3>Emma Watson</h3>
-                    <p>Managing Director</p>
-                </div>
-                <div className="team-member">
-                    <img src={will} alt="Will Smith" className="about-image" />
-                    <h3>Will Smith</h3>
-                    <p>Product Designer</p>
-                </div>
-            </div>
             <div className="carousel-indicators">
-                <span className="indicator "></span>
-                <span className="indicator"></span>
-                <span className="indicator active"></span>
-                <span className="indicator"></span>
-                <span className="indicator"></span>
+                {['indicator-1', 'indicator-2', 'indicator-3', 'indicator-4', 'indicator-5'].map((id, index) => (
+                    <span
+                        key={id}
+                        className={`indicator ${index === 2 ? 'active' : ''}`}
+                    ></span>
+                ))}
             </div>
 
-            <div className="features" style={{ display: 'flex', justifyContent: 'space-around', textAlign: 'center', marginTop: '40px' }}>
-                <div className="feature">
-                    <img src={m5} className="about-image" />
+            <section className="features-section">
+                <div className="feature-card">
+                    <img src={m5} alt="Free delivery icon" className="feature-icon" />
                     <h3>FREE AND FAST DELIVERY</h3>
                     <p>Free delivery for all orders over $140</p>
                 </div>
-                <div className="feature">
-                    <img src={m6} className="about-image" />
+                <div className="feature-card">
+                    <img src={m6} alt="Customer service icon" className="feature-icon" />
                     <h3>24/7 CUSTOMER SERVICE</h3>
                     <p>Friendly 24/7 customer support</p>
                 </div>
-                <div className="feature">
-                    <img src={m7} className="about-image" />
+                <div className="feature-card">
+                    <img src={m7} alt="Money back guarantee icon" className="feature-icon" />
                     <h3>MONEY BACK GUARANTEE</h3>
                     <p>We return money within 30 days</p>
                 </div>
-            </div>
+            </section>
         </div>
     );
-} 
+}
