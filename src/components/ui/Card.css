@@ -22,7 +22,7 @@
   position: relative;
   overflow: hidden;
   height: 250px;
-  background-color: #F5F5F5;
+  background-color: #ffffff;
 }
 
 .product-img {
@@ -80,6 +80,17 @@
   cursor: pointer;
   font-size: 0.9rem;
   margin-top: 10px;
+}
+
+.add-to-cart.added {
+  background-color: #4CAF50;
+  color: white;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.add-to-cart:disabled {
+  cursor: not-allowed;
 }
 
 .product-description {
