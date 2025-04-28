@@ -1,10 +1,12 @@
 
 import { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { AuthProvider } from "./context/AuthContext"
 import Home from './pages/Home'
 import Product from './pages/Product'
 import About from './pages/About'
 import Contact from './pages/Contact'
+import AccountPage from './pages/AccountPage'
 import Signup from './pages/Signup'
 import Login from './pages/Login'
 import ResetPassword from './pages/ResetPassword'
