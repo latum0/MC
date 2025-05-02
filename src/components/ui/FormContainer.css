@@ -44,6 +44,20 @@
     margin: 15px 0;
     color: #888;
   }
+  .error-message {
+    color: rgb(241, 10, 10);
+     
+    font-size: 16px;
+    font-weight: bold;
+    padding: 10px;  /* Ajouter de l'espace autour du texte */
+   
+    margin-bottom: 15px;  /* Un petit espacement en bas pour l'alignement */
+    text-align: center;  /* Centrer le texte */
+    
+  }
+  
+  
+  
   
   .google-btn {
     width: 100%;
