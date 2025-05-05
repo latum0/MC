@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Card from './Card';
 import Diviser from './Diviser';
 import './Best-selling.css';
 
 function BestS() {
-  const [products, setProducts] = useState([]); // State to store fetched products
+  const navigate = useNavigate();
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -20,11 +22,10 @@ function BestS() {
 
         const result = await response.json();
         if (result.success) {
-          // Sort products by createdAt in descending order and take the last 4
           const sortedProducts = result.data.sort((a, b) => 
             new Date(b.createdAt) - new Date(a.createdAt)
           );
-          setProducts(sortedProducts.slice(0, 4)); // Take the first 4 after sorting
+          setProducts(sortedProducts.slice(0, 4));
         } else {
           throw new Error(result.message || "Failed to fetch products");
         }
@@ -41,13 +42,16 @@ function BestS() {
 
   return (
     <div className="sales-container">
-      {/* Divider Component */}
       <div className="top-best-product-container">
         <Diviser name="This Month" title="Best Selling Products" />
-        <button className="view-all-button">View All</button>
+        <button 
+          className="view-all-button"
+          onClick={() => navigate('/products')}
+        >
+          View All
+        </button>
       </div>
 
-      {/* Products Grid */}
       <div className="products-grid">
         {loading ? (
           <p>Loading products...</p>
@@ -58,10 +62,11 @@ function BestS() {
         ) : (
           products.map(product => (
             <Card 
-              key={product._id} // Use MongoDB _id as the unique key
-              img={product.image?.[0] || 'https://via.placeholder.com/150'} // Use the first image or a placeholder
+              key={product._id}
+              id={product._id}
+              img={product.image?.[0] || 'https://via.placeholder.com/150'}
               name={product.name}
-              price={product.salePrice || product.price} // Use salePrice if available
+              price={product.salePrice || product.price}
               rating={product.rating || 0}
               star={product.rating || 0}
             />

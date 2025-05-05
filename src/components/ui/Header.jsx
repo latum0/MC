@@ -1,11 +1,8 @@
-import React, { useState, useRef } from 'react';
+// Header.js
+import React, { useState, useEffect, useRef } from 'react';
 import './Header.css';
 import { MdFavoriteBorder } from "react-icons/md";
 import { MdOutlineShoppingCart } from "react-icons/md";
-<<<<<<< HEAD
-=======
-import { MdAccountCircle } from "react-icons/md"; 
->>>>>>> 97fae3ca88f5350a104ef203f8b1158465f0bcf6
 import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
@@ -20,25 +17,49 @@ const Header = () => {
   const navigate = useNavigate();
   const inputRef = useRef(null);
 
-<<<<<<< HEAD
-  // Function to handle navigation to Home
+  // Load cart count dynamically
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    const loadCartCount = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const res = await fetch('http://localhost:5000/api/cart', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const cart = await res.json();
+          setCartCount(cart?.items?.length || 0);
+        } catch (err) {
+          console.error("Failed to load cart", err);
+        }
+      } else {
+        const guestCart = JSON.parse(localStorage.getItem('guestCart')) || [];
+        setCartCount(guestCart.length);
+      }
+    };
+
+    loadCartCount();
+
+    const handleStorageChange = () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        const guestCart = JSON.parse(localStorage.getItem('guestCart')) || [];
+        setCartCount(guestCart.length);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+
+  }, []);
+
   const homeHandler = () => {
     navigate(`/`);
   };
 
-  // Function to handle link clicks
-=======
-  const homeHandler = () => {
-    navigate('/');
-    setLinks({
-      home: true,
-      about: false,
-      contact: false,
-      signup: false
-    });
-  };
-
->>>>>>> 97fae3ca88f5350a104ef203f8b1158465f0bcf6
   const linkNavbar = (e, name) => {
     e.preventDefault();
     setLinks({
@@ -47,22 +68,14 @@ const Header = () => {
       contact: name === 'contact',
       signup: name === 'signup',
     });
-
-    if (name === 'signup') {
-      navigate('/login');
-    } else {
-      navigate(`/${name === 'home' ? '' : name}`);
-    }
   };
 
-  // Fetch recommendations based on the query
   const fetchRecommendations = async (query) => {
     if (!query.trim()) {
       setRecommendations([]);
       setShowRecommendations(false);
       return;
     }
-
     try {
       const response = await fetch(`http://localhost:5000/api/products/search?q=${encodeURIComponent(query)}`);
       if (!response.ok) throw new Error('Failed to fetch recommendations');
@@ -76,13 +89,11 @@ const Header = () => {
     }
   };
 
-  // Handle search input changes
   const handleInputChange = (e) => {
     const query = e.target.value;
     fetchRecommendations(query);
   };
 
-  // Handle search submission
   const handleSearch = (e) => {
     e.preventDefault();
     const query = inputRef.current.value.trim();
@@ -98,11 +109,7 @@ const Header = () => {
       <header className="navbar">
         {/* Logo */}
         <div className="navbar-logo" onClick={homeHandler}>
-<<<<<<< HEAD
           <img src="src/assets/logoMC.png" alt="Logo" className="logo-img" />
-=======
-          <img src="src/assets/logoMC.png" alt="Logo" className="logo-img" /> 
->>>>>>> 97fae3ca88f5350a104ef203f8b1158465f0bcf6
         </div>
 
         {/* Navigation Links */}
@@ -116,21 +123,19 @@ const Header = () => {
           <a href="/contact" onClick={(e) => linkNavbar(e, 'contact')}>
             Contact {links.contact && <div className="lineUnder"></div>}
           </a>
-          <a href="/login" onClick={(e) => linkNavbar(e, 'signup')}>
+          <a href="/signup" onClick={(e) => linkNavbar(e, 'signup')}>
             Sign Up {links.signup && <div className="lineUnder"></div>}
           </a>
         </nav>
 
-        {/* Search and Icons */}
+        {/* Right Section */}
         <div className="navbar-right">
-<<<<<<< HEAD
           {/* Search Input */}
           <div className="input-div">
             <form onSubmit={handleSearch} className="search-form">
               <input
                 type="text"
                 placeholder="Que cherchez-vous ?"
-                className="navbar-search"
                 ref={inputRef}
                 onChange={handleInputChange}
               />
@@ -138,38 +143,31 @@ const Header = () => {
                 <img src="src/assets/search.png" alt="search" />
               </button>
             </form>
+
             {/* Recommendations Dropdown */}
             {showRecommendations && recommendations.length > 0 && (
               <ul className="recommendations-dropdown">
                 {recommendations.map((product) => (
-                  <li
-                    key={product._id}
-                    onClick={() => {
-                      navigate(`/product/${product._id}`);
-                      setShowRecommendations(false);
-                    }}
-                  >
+                  <li key={product._id} onClick={() => {
+                    navigate(`/product/${product._id}`);
+                    setShowRecommendations(false);
+                  }}>
                     {product.name}
                   </li>
                 ))}
               </ul>
             )}
-=======
-          <div className="input-div">
-            <input
-              type="text"
-              placeholder="Que cherchez-vous ?"
-              className="navbar-search"
-              ref={inputRef}
-            />
-            <img src="src/assets/search.png" alt="search" />
->>>>>>> 97fae3ca88f5350a104ef203f8b1158465f0bcf6
           </div>
 
-          {/* Favorite and Cart Icons */}
+          {/* Icons */}
           <MdFavoriteBorder className="fav-logo" />
-          <MdOutlineShoppingCart className="cart-logo" />
-          {/*<MdAccountCircle className="profile-logo" />*/}
+
+          <div className="cart-icon-wrapper" onClick={() => navigate('/cart')}>
+            <MdOutlineShoppingCart className="cart-logo" />
+            {cartCount > 0 && (
+              <span className="cart-count-badge">{cartCount}</span>
+            )}
+          </div>
         </div>
       </header>
     </div>
