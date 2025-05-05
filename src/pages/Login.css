@@ -37,6 +37,7 @@
 }
 
 
+
 @keyframes slideRight {
   from {
     transform: translateX(-100%);

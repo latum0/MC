@@ -7,25 +7,65 @@ import ResetPassword from './pages/ResetPassword';
 import Header from './components/ui/Header';
 import Footer from './components/ui/Footer';
 import AccountPage from './pages/AccountPage';
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import Home from "./pages/Home";
+import Product from "./pages/Product";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Contact from "./pages/Contact";
+import About from "./pages/About";
+import ResetPassword from "./pages/ResetPassword";
+import AccountPage from "./pages/AccountPage";
+import AdminLayout from "./admin/components/AdminLayout";
+import Dashboard from "./admin/pages/Dashboard";
+import Products from "./admin/pages/Products";
+import Orders from "./admin/pages/Orders";
+import Clients from "./admin/pages/Clients";
+import Payments from "./admin/pages/Payments";
+import Transactions from "./admin/pages/Transactions";
+import PrivateAdminRoute from "./components/ui/PrivateAdminRoute";
+import Header from "./components/ui/Header";
+import Footer from "./components/ui/Footer";
+import "./App.css";
 
+import { useEffect } from "react";
 
-import Dashboard from "./pages/seller/Dashboard"
-import Products from "./pages/seller/SellerProducts"
-import AddProduct from "./pages/seller/AddProduct"
-import EditProduct from "./pages/seller/EditProduct"
-import Orders from "./pages/seller/Orders"
-import OrderDetails from "./pages/seller/OrderDetails"
-import Inventory from "./pages/seller/Inventory"
-import Analytics from "./pages/seller/Analytics"
-import AdminProfile from "./pages/seller/AdminProfile"
+function LayoutWrapper() {
+  const location = useLocation();
 
+  // Liste des routes admin
+  const adminPaths = [
+    "/dashboard",
+    "/produits",
+    "/commandes",
+    "/clients",
+    "/paiements",
+    "/transactions"
+  ];
 
-function App() {
- 
+  // Vérifie si on est dans une route admin
+  const isAdminRoute = adminPaths.some((path) =>
+    location.pathname.startsWith(path)
+  );
+
   return (
-    <Router>
-      <Header />
+    <>
+      {!isAdminRoute && <Header />}
+
       <Routes>
+        {/* Routes publiques */}
+        <Route path="/" element={<Home />} />
+        <Route path="/products/:productId" element={<Product />} />
+        <Route path="/Contact" element={<Contact />} />
+        <Route path="/About" element={<About />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/AccountPage" element={<AccountPage />} />
+
+
+        {/* seller*/}
+
         <Route path="/" element={<Home />} />
         <Route path="/products/:id" element={<Product />} />
         <Route path="/login" element={<Login />} />
@@ -33,24 +73,37 @@ function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/account" element={<AccountPage />} />
 
-
-
-        {/*<Route path="/" element={<Dashboard />} />
-        <Route path="/products" element={<Products />} />
-        <Route path="/products/add" element={<AddProduct />} />
-        <Route path="/Adminproducts/:id/edit" element={<EditProduct />} />
-        <Route path="/orders" element={<Orders />} />
-        <Route path="/orders/:id" element={<OrderDetails />} />
-        <Route path="/inventory" element={<Inventory />} />
-        <Route path="/analytics" element={<Analytics/>} />
-        <Route path="/profile" element={<AdminProfile />} />*/}
-
-
-
+        {/* Routes admin */}
+        <Route
+          element={
+            <PrivateAdminRoute>
+              <AdminLayout />
+            </PrivateAdminRoute>
+          }
+        >
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/produits" element={<Products />} />
+          <Route path="/commandes" element={<Orders />} />
+          <Route path="/clients" element={<Clients />} />
+          <Route path="/paiements" element={<Payments />} />
+          <Route path="/transactions" element={<Transactions />} />
+        </Route>
       </Routes>
 
+      {!isAdminRoute && <Footer />}
+    </>
+  );
+}
 
-      {/*<Footer />*/}
+
+
+
+
+function App() {
+ 
+  return (
+    <Router>
+      <LayoutWrapper />
     </Router>
   );
 }

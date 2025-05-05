@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import Sales from '../components/ui/Sales';
 import Header from '../components/ui/Header';
 import Hero from '../components/ui/Hero';
@@ -12,26 +13,23 @@ import New from '../components/ui/New';
 
 
 const Home = () => {
-  return (
-    
-      <div className="home-container">
-          
-          <Hero/>
-          <Sales/>
-          <BestS/>
-          <ImgDev/>
-          <AllProductsSection/>
-          <New/>
-          
-          
-          
-        
-        
-      </div>
-   
-     
-    
-  )
+    return (
+
+        <div className="home-container">
+
+            <Hero />
+            <Sales />
+            <BestS />
+            <ImgDev />
+            <AllProductsSection />
+            <New />
+
+
+        </div>
+
+
+
+    )
 }
 
 export default Home

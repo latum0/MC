@@ -1,9 +1,11 @@
-// Header.js
-import React, { useState, useEffect, useRef } from 'react';
-import './Header.css';
-import { MdFavoriteBorder } from "react-icons/md";
-import { MdOutlineShoppingCart } from "react-icons/md";
-import { useNavigate } from 'react-router-dom';
+
+import { useState, useRef, useEffect } from "react"
+import "./Header.css"
+import { MdFavoriteBorder } from "react-icons/md"
+import { MdOutlineShoppingCart } from "react-icons/md"
+import { MdAccountCircle } from "react-icons/md"
+import { MdLogout } from "react-icons/md"
+import { useNavigate } from "react-router-dom"
 
 const Header = () => {
   const [links, setLinks] = useState({
@@ -11,11 +13,12 @@ const Header = () => {
     about: false,
     contact: false,
     signup: false,
-  });
-  const [recommendations, setRecommendations] = useState([]);
-  const [showRecommendations, setShowRecommendations] = useState(false);
-  const navigate = useNavigate();
-  const inputRef = useRef(null);
+  })
+  const [recommendations, setRecommendations] = useState([])
+  const [showRecommendations, setShowRecommendations] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const navigate = useNavigate()
+  const inputRef = useRef(null)
 
   // Load cart count dynamically
   const [cartCount, setCartCount] = useState(0);
@@ -61,48 +64,67 @@ const Header = () => {
   };
 
   const linkNavbar = (e, name) => {
-    e.preventDefault();
+    e.preventDefault()
     setLinks({
-      home: name === 'home',
-      about: name === 'about',
-      contact: name === 'contact',
-      signup: name === 'signup',
-    });
-  };
+      home: name === "home",
+      about: name === "about",
+      contact: name === "contact",
+      signup: name === "signup",
+
+    })
+
+    if (name === "signup") {
+      navigate("/login")
+    } else {
+      navigate(`/${name === "home" ? "" : name}`)
+    }
+  }
+  const goToAccountPage = () => {
+    navigate("/AccountPage")
+  }
+
 
   const fetchRecommendations = async (query) => {
     if (!query.trim()) {
-      setRecommendations([]);
-      setShowRecommendations(false);
-      return;
+      setRecommendations([])
+      setShowRecommendations(false)
+      return
     }
     try {
-      const response = await fetch(`http://localhost:5000/api/products/search?q=${encodeURIComponent(query)}`);
-      if (!response.ok) throw new Error('Failed to fetch recommendations');
-      const result = await response.json();
-      setRecommendations(result.data.slice(0, 5));
-      setShowRecommendations(true);
+      const response = await fetch(`http://localhost:5000/api/products/search?q=${encodeURIComponent(query)}`)
+      if (!response.ok) throw new Error("Failed to fetch recommendations")
+      const result = await response.json()
+      setRecommendations(result.data.slice(0, 5))
+      setShowRecommendations(true)
     } catch (error) {
-      console.error('Error fetching recommendations:', error.message);
-      setRecommendations([]);
-      setShowRecommendations(false);
+      console.error("Error fetching recommendations:", error.message)
+      setRecommendations([])
+      setShowRecommendations(false)
     }
-  };
+  }
 
   const handleInputChange = (e) => {
-    const query = e.target.value;
-    fetchRecommendations(query);
-  };
+    const query = e.target.value
+    fetchRecommendations(query)
+  }
+
 
   const handleSearch = (e) => {
-    e.preventDefault();
-    const query = inputRef.current.value.trim();
+    e.preventDefault()
+    const query = inputRef.current.value.trim()
     if (query) {
-      navigate(`/search?q=${encodeURIComponent(query)}`);
-      setShowRecommendations(false);
-      inputRef.current.value = '';
+      navigate(`/search?q=${encodeURIComponent(query)}`)
+      setShowRecommendations(false)
+      inputRef.current.value = ""
     }
-  };
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem("token")
+    localStorage.removeItem("user")
+    setIsLoggedIn(false)
+    window.location.reload()
+  }
 
   return (
     <div className="nav-container">
@@ -114,18 +136,23 @@ const Header = () => {
 
         {/* Navigation Links */}
         <nav className="navbar-links">
-          <a href="/" onClick={(e) => linkNavbar(e, 'home')}>
+          <a href="/" onClick={(e) => linkNavbar(e, "home")}>
             Home {links.home && <div className="lineUnder"></div>}
           </a>
-          <a href="/about" onClick={(e) => linkNavbar(e, 'about')}>
+          <a href="/About" onClick={(e) => linkNavbar(e, "about")}>
             About {links.about && <div className="lineUnder"></div>}
           </a>
-          <a href="/contact" onClick={(e) => linkNavbar(e, 'contact')}>
+          <a href="/Contact" onClick={(e) => linkNavbar(e, "contact")}>
             Contact {links.contact && <div className="lineUnder"></div>}
           </a>
-          <a href="/signup" onClick={(e) => linkNavbar(e, 'signup')}>
+          {/*<a href="/signup" onClick={(e) => linkNavbar(e, 'signup')}>
             Sign Up {links.signup && <div className="lineUnder"></div>}
-          </a>
+          </a>*/}
+          {!isLoggedIn && (
+            <a href="/login" onClick={(e) => linkNavbar(e, "signup")}>
+              Sign Up {links.signup && <div className="lineUnder"></div>}
+            </a>
+          )}
         </nav>
 
         {/* Right Section */}
@@ -161,17 +188,19 @@ const Header = () => {
 
           {/* Icons */}
           <MdFavoriteBorder className="fav-logo" />
+          <MdOutlineShoppingCart className="cart-logo" />
 
-          <div className="cart-icon-wrapper" onClick={() => navigate('/cart')}>
-            <MdOutlineShoppingCart className="cart-logo" />
-            {cartCount > 0 && (
-              <span className="cart-count-badge">{cartCount}</span>
-            )}
-          </div>
+          {/* Afficher les icônes de profil et déconnexion uniquement si l'utilisateur est connecté */}
+          {isLoggedIn && (
+            <>
+              <MdAccountCircle className="profile-logo" onClick={goToAccountPage} title="Mon Compte" />
+              <MdLogout className="logout-icon" onClick={handleLogout} title="Déconnexion" />
+            </>
+          )}
         </div>
       </header>
     </div>
-  );
-};
+  )
+}
 
 export default Header;
