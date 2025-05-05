@@ -1,21 +1,18 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
-import Product from './pages/Product';
-import Login from './pages/Login'; 
-import Signup from './pages/Signup';
-import ResetPassword from './pages/ResetPassword';
-import Header from './components/ui/Header';
-import Footer from './components/ui/Footer';
-import AccountPage from './pages/AccountPage';
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+
 import Home from "./pages/Home";
 import Product from "./pages/Product";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import ResetPassword from "./pages/ResetPassword";
 import Contact from "./pages/Contact";
 import About from "./pages/About";
-import ResetPassword from "./pages/ResetPassword";
 import AccountPage from "./pages/AccountPage";
+
+import Header from "./components/ui/Header";
+import Footer from "./components/ui/Footer";
+import PrivateAdminRoute from "./components/ui/PrivateAdminRoute";
+
 import AdminLayout from "./admin/components/AdminLayout";
 import Dashboard from "./admin/pages/Dashboard";
 import Products from "./admin/pages/Products";
@@ -23,17 +20,12 @@ import Orders from "./admin/pages/Orders";
 import Clients from "./admin/pages/Clients";
 import Payments from "./admin/pages/Payments";
 import Transactions from "./admin/pages/Transactions";
-import PrivateAdminRoute from "./components/ui/PrivateAdminRoute";
-import Header from "./components/ui/Header";
-import Footer from "./components/ui/Footer";
-import "./App.css";
 
-import { useEffect } from "react";
+import "./App.css";
 
 function LayoutWrapper() {
   const location = useLocation();
 
-  // Liste des routes admin
   const adminPaths = [
     "/dashboard",
     "/produits",
@@ -43,7 +35,6 @@ function LayoutWrapper() {
     "/transactions"
   ];
 
-  // Vérifie si on est dans une route admin
   const isAdminRoute = adminPaths.some((path) =>
     location.pathname.startsWith(path)
   );
@@ -53,27 +44,17 @@ function LayoutWrapper() {
       {!isAdminRoute && <Header />}
 
       <Routes>
-        {/* Routes publiques */}
-        <Route path="/" element={<Home />} />
-        <Route path="/products/:productId" element={<Product />} />
-        <Route path="/Contact" element={<Contact />} />
-        <Route path="/About" element={<About />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/AccountPage" element={<AccountPage />} />
-
-
-        {/* seller*/}
-
+        {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/products/:id" element={<Product />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/about" element={<About />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/account" element={<AccountPage />} />
 
-        {/* Routes admin */}
+        {/* Admin Routes (Protected) */}
         <Route
           element={
             <PrivateAdminRoute>
@@ -95,12 +76,7 @@ function LayoutWrapper() {
   );
 }
 
-
-
-
-
 function App() {
- 
   return (
     <Router>
       <LayoutWrapper />

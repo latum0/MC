@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react"
 import "./Header.css"
 import { MdFavoriteBorder } from "react-icons/md"
@@ -20,48 +19,23 @@ const Header = () => {
   const navigate = useNavigate()
   const inputRef = useRef(null)
 
-  // Load cart count dynamically
-  const [cartCount, setCartCount] = useState(0);
-
   useEffect(() => {
-    const loadCartCount = async () => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        try {
-          const res = await fetch('http://localhost:5000/api/cart', {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          const cart = await res.json();
-          setCartCount(cart?.items?.length || 0);
-        } catch (err) {
-          console.error("Failed to load cart", err);
-        }
-      } else {
-        const guestCart = JSON.parse(localStorage.getItem('guestCart')) || [];
-        setCartCount(guestCart.length);
-      }
-    };
-
-    loadCartCount();
-
-    const handleStorageChange = () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        const guestCart = JSON.parse(localStorage.getItem('guestCart')) || [];
-        setCartCount(guestCart.length);
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-
-  }, []);
+    // Vérifier si l'utilisateur est connecté
+    const token = localStorage.getItem("token")
+    if (token) {
+      setIsLoggedIn(true)
+    }
+  }, [])
 
   const homeHandler = () => {
-    navigate(`/`);
-  };
+    navigate("/")
+    setLinks({
+      home: true,
+      about: false,
+      contact: false,
+      signup: false,
+    })
+  }
 
   const linkNavbar = (e, name) => {
     e.preventDefault()
@@ -84,12 +58,14 @@ const Header = () => {
   }
 
 
+  // Fetch recommendations based on the query
   const fetchRecommendations = async (query) => {
     if (!query.trim()) {
       setRecommendations([])
       setShowRecommendations(false)
       return
     }
+
     try {
       const response = await fetch(`http://localhost:5000/api/products/search?q=${encodeURIComponent(query)}`)
       if (!response.ok) throw new Error("Failed to fetch recommendations")
@@ -145,9 +121,6 @@ const Header = () => {
           <a href="/Contact" onClick={(e) => linkNavbar(e, "contact")}>
             Contact {links.contact && <div className="lineUnder"></div>}
           </a>
-          {/*<a href="/signup" onClick={(e) => linkNavbar(e, 'signup')}>
-            Sign Up {links.signup && <div className="lineUnder"></div>}
-          </a>*/}
           {!isLoggedIn && (
             <a href="/login" onClick={(e) => linkNavbar(e, "signup")}>
               Sign Up {links.signup && <div className="lineUnder"></div>}
@@ -155,38 +128,20 @@ const Header = () => {
           )}
         </nav>
 
-        {/* Right Section */}
+        {/* Search and Icons */}
         <div className="navbar-right">
-          {/* Search Input */}
           <div className="input-div">
-            <form onSubmit={handleSearch} className="search-form">
-              <input
-                type="text"
-                placeholder="Que cherchez-vous ?"
-                ref={inputRef}
-                onChange={handleInputChange}
-              />
-              <button type="submit" className="search-button">
-                <img src="src/assets/search.png" alt="search" />
-              </button>
-            </form>
-
-            {/* Recommendations Dropdown */}
-            {showRecommendations && recommendations.length > 0 && (
-              <ul className="recommendations-dropdown">
-                {recommendations.map((product) => (
-                  <li key={product._id} onClick={() => {
-                    navigate(`/product/${product._id}`);
-                    setShowRecommendations(false);
-                  }}>
-                    {product.name}
-                  </li>
-                ))}
-              </ul>
-            )}
+            <input
+              type="text"
+              placeholder="Que cherchez-vous ?"
+              className="navbar-search"
+              ref={inputRef}
+              onChange={handleInputChange}
+            />
+            <img src="src/assets/search.png" alt="search" onClick={handleSearch} />
           </div>
 
-          {/* Icons */}
+          {/* Favorite and Cart Icons */}
           <MdFavoriteBorder className="fav-logo" />
           <MdOutlineShoppingCart className="cart-logo" />
 
