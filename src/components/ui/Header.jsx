@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react"
 import "./Header.css"
 import { MdFavoriteBorder } from "react-icons/md"
@@ -45,6 +44,7 @@ const Header = () => {
       about: name === "about",
       contact: name === "contact",
       signup: name === "signup",
+
     })
 
     if (name === "signup") {
@@ -56,7 +56,7 @@ const Header = () => {
   const goToAccountPage = () => {
     navigate("/AccountPage")
   }
-  
+
 
   // Fetch recommendations based on the query
   const fetchRecommendations = async (query) => {
@@ -84,7 +84,7 @@ const Header = () => {
     fetchRecommendations(query)
   }
 
-  
+
   const handleSearch = (e) => {
     e.preventDefault()
     const query = inputRef.current.value.trim()
@@ -115,10 +115,10 @@ const Header = () => {
           <a href="/" onClick={(e) => linkNavbar(e, "home")}>
             Home {links.home && <div className="lineUnder"></div>}
           </a>
-          <a href="/about" onClick={(e) => linkNavbar(e, "about")}>
+          <a href="/About" onClick={(e) => linkNavbar(e, "about")}>
             About {links.about && <div className="lineUnder"></div>}
           </a>
-          <a href="/contact" onClick={(e) => linkNavbar(e, "contact")}>
+          <a href="/Contact" onClick={(e) => linkNavbar(e, "contact")}>
             Contact {links.contact && <div className="lineUnder"></div>}
           </a>
           {!isLoggedIn && (
@@ -145,11 +145,11 @@ const Header = () => {
           <MdFavoriteBorder className="fav-logo" />
           <MdOutlineShoppingCart className="cart-logo" />
 
-            {/* Afficher les icônes de profil et déconnexion uniquement si l'utilisateur est connecté */}
-            {isLoggedIn && (
+          {/* Afficher les icônes de profil et déconnexion uniquement si l'utilisateur est connecté */}
+          {isLoggedIn && (
             <>
-  <MdAccountCircle className="profile-logo" onClick={goToAccountPage} title="Mon Compte" />
-                <MdLogout className="logout-icon" onClick={handleLogout} title="Déconnexion" />
+              <MdAccountCircle className="profile-logo" onClick={goToAccountPage} title="Mon Compte" />
+              <MdLogout className="logout-icon" onClick={handleLogout} title="Déconnexion" />
             </>
           )}
         </div>

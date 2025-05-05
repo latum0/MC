@@ -17,6 +17,18 @@
   --spacing-unit: 1rem;
 }
 
+<<<<<<< HEAD
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: #535bf2;
+=======
 *,
 *::before,
 *::after {
@@ -27,9 +39,27 @@
 
 html {
   scroll-behavior: smooth;
+>>>>>>> db256295e5c4962a0b55daab6f0610d10fda96a6
 }
 
+
 body {
+<<<<<<< HEAD
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+=======
   font-family: var(--base-font);
   font-size: var(--font-size-base);
   line-height: var(--line-height-base);
@@ -69,10 +99,40 @@ a {
 
 a:hover {
   color: var(--hover-color);
+>>>>>>> db256295e5c4962a0b55daab6f0610d10fda96a6
 }
 
+/* Buttons */
 button {
   cursor: pointer;
+<<<<<<< HEAD
+  transition: border-color 0.25s, background-color 0.2s;
+}
+
+button:hover {
+  border-color: #646cff;
+}
+
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+
+  a:hover {
+    color: #747bff;
+  }
+
+  button {
+    background-color: #f9f9f9;
+  }
+=======
   transition: all 0.3s ease;
 }
 
@@ -93,4 +153,5 @@ button {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+>>>>>>> db256295e5c4962a0b55daab6f0610d10fda96a6
 }
