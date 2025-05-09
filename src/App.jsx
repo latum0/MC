@@ -52,7 +52,7 @@ function LayoutWrapper() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/account" element={<AccountPage />} />
+        <Route path="/AccountPage" element={<AccountPage />} />
 
         {/* Admin Routes (Protected) */}
         <Route
