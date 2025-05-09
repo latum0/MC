@@ -16,7 +16,7 @@ function Orders() {
         const token = localStorage.getItem('token');
         
         if (!token) {
-          window.location.href = '/login';
+          window.location.href = '/commandes';
           return;
         }
   
@@ -30,7 +30,7 @@ function Orders() {
       } catch (error) {
         if (error.response?.status === 401) {
           localStorage.removeItem('token');
-          window.location.href = '/login';
+          window.location.href = '/commandes';
         } else {
           setError(error.message);
         }
