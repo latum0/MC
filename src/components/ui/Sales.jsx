@@ -1,23 +1,24 @@
+// AllProductsSection.jsx
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Card from './Card';
 import './AllProductsSection.css';
 import Diviser from './Diviser';
 
-const AllProductsSection = () => {
+const Sales = () => {
   const [products, setProducts] = useState([]); // State to store fetched products
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   // Fetch products from the backend
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await fetch('http://localhost:5000/api/products');
-        
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-
         const result = await response.json();
         if (result.success) {
           // Limit to 4 products for this section
@@ -40,13 +41,15 @@ const AllProductsSection = () => {
     <section className="products-section">
       {/* Divider Component */}
       <div className="diviser-container">
-        <Diviser name="Our Products" />
+        <Diviser name="Sales" />
       </div>
 
       {/* Section Header */}
       <div className="section-header">
         <h2>Explore Our Products</h2>
-        <button className="view-all-button">View All</button>
+        <button className="view-all-button" onClick={() => navigate('/ProductListingPage')}>
+          View All
+        </button>
       </div>
 
       {/* Products Grid */}
@@ -76,4 +79,4 @@ const AllProductsSection = () => {
   );
 };
 
-export default AllProductsSection;
+export default Sales;

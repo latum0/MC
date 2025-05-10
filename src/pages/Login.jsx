@@ -1,49 +1,47 @@
-import { useState } from "react"
-import "./Login.css"
-import CardImage from "../components/ui/cardimage"
-import FormContainer from "../components/ui/FormContainer"
-import axios from "axios"
-import { useNavigate } from "react-router-dom"
+import { useState } from "react";
+import "./Login.css";
+import CardImage from "../components/ui/cardimage";
+import FormContainer from "../components/ui/FormContainer";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
-  const [error, setError] = useState(null)
-  const navigate = useNavigate()
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const handleSubmit = async ({ email, password }) => {
     try {
       const response = await axios.post("http://localhost:5000/api/users/login", {
         email,
         password,
-      })
+      });
 
-      const user = response.data.user // ✅ On récupère l'utilisateur
+      const user = response.data.user;
 
-      localStorage.setItem("token", response.data.token)
-      localStorage.setItem("user", JSON.stringify(user))
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(user));
 
-      // ✅ Redirection en fonction du rôle
       if (user.role === "admin") {
-        navigate("/dashboard")
+        navigate("/dashboard");
       } else {
-        navigate("/")
+        navigate("/");
       }
 
-      // Pour mettre à jour le header dynamiquement
-      window.location.reload()
+      window.location.reload();
     } catch (err) {
-      console.error(err)
+      console.error(err);
 
       if (err.response) {
-        setError(err.response.data.message || "Une erreur s'est produite.")
+        setError(err.response.data.message || "Une erreur s'est produite.");
       } else {
-        setError("Une erreur de connexion est survenue.")
+        setError("Une erreur de connexion est survenue.");
       }
     }
   }
 
   return (
-    <div className="container slide-page-right">
-      <div className="card">
+    <div className="loginWrapper slide-page-right">
+      <div className="authCard">
         <CardImage />
         <FormContainer
           title="Welcome Back"
@@ -57,6 +55,7 @@ export default function Login() {
           errorMessage={error}
         />
       </div>
+      
     </div>
-  )
+  );
 }

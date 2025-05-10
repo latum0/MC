@@ -1,15 +1,17 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Header.css";
-import { MdFavoriteBorder } from "react-icons/md";
-import { MdOutlineShoppingCart } from "react-icons/md";
-import { MdAccountCircle } from "react-icons/md";
-import { MdLogout } from "react-icons/md";
+import {
+  MdFavoriteBorder,
+  MdOutlineShoppingCart,
+  MdAccountCircle,
+  MdLogout,
+} from "react-icons/md";
 
 const Header = () => {
   const navigate = useNavigate();
   const [sellerId, setSellerId] = useState(null);
-  const [user, setUser] = useState(null); // Track authentication state
+  const [user, setUser] = useState(null);
   const [links, setLinks] = useState({
     home: true,
     about: false,
@@ -17,22 +19,39 @@ const Header = () => {
     signup: false,
   });
   const [recommendations, setRecommendations] = useState([]);
-  const [showRecommendations, setShowRecommendations] = useState(false);
+  const [recommendationsOpen, setRecommendationsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const inputRef = useRef(null);
+  const searchWrapperRef = useRef(null);
 
-  // Check if user is logged in (get token)
+  // Close recommendations when clicking outside the search wrapper
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        searchWrapperRef.current &&
+        !searchWrapperRef.current.contains(e.target)
+      ) {
+        setRecommendationsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Check if user is logged in on mount
   useEffect(() => {
     const token = localStorage.getItem("token");
-
     if (token) {
       fetchSellerProfile(token);
     } else {
-      setUser(null); // User is not authenticated
-      setSellerId(null); // No seller ID
+      setUser(null);
+      setSellerId(null);
     }
   }, []);
 
-  // Fetch seller profile
+  // Fetch seller profile using the provided token
   const fetchSellerProfile = async (token) => {
     try {
       const res = await fetch("http://localhost:5000/api/users/profile", {
@@ -42,12 +61,10 @@ const Header = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-
       if (!res.ok) throw new Error("Failed to fetch user profile");
-
       const userData = await res.json();
-      setUser(userData); // Set user data
-      setSellerId(userData._id); // Set seller ID
+      setUser(userData);
+      setSellerId(userData._id);
     } catch (err) {
       console.error("Error fetching seller ID:", err.message);
       setUser(null);
@@ -55,7 +72,7 @@ const Header = () => {
     }
   };
 
-  // Handle navigation to Dashboard (Protected)
+  // Navigate to the seller dashboard (protected)
   const handleDashboardNavigation = () => {
     if (user && sellerId) {
       navigate(`/DashboardSeller/${sellerId}`);
@@ -65,14 +82,15 @@ const Header = () => {
     }
   };
 
-  // Handle logout
+  // Logout handler
   const handleLogout = () => {
-    localStorage.removeItem("token"); // Remove JWT
-    setUser(null); // Clear user state
-    setSellerId(null); // Clear seller ID
-    navigate("/login"); // Redirect to login
+    localStorage.removeItem("token");
+    setUser(null);
+    setSellerId(null);
+    navigate("/login");
   };
 
+  // Navigation for navbar links
   const linkNavbar = (e, name) => {
     e.preventDefault();
     setLinks({
@@ -81,7 +99,6 @@ const Header = () => {
       contact: name === "contact",
       signup: name === "signup",
     });
-
     if (name === "signup") {
       navigate("/login");
     } else {
@@ -89,40 +106,44 @@ const Header = () => {
     }
   };
 
+  // Search logic
   const fetchRecommendations = async (query) => {
-    if (!query.trim()) {
+    if (!query.trim() || query.trim().length < 2) {
       setRecommendations([]);
-      setShowRecommendations(false);
+      setRecommendationsOpen(false);
       return;
     }
-
     try {
       const response = await fetch(
-        `http://localhost:5000/api/products/search?q=${encodeURIComponent(query)}`
+        `http://localhost:5000/api/products/search?q=${encodeURIComponent(
+          query
+        )}`
       );
-      if (!response.ok) throw new Error("Failed to fetch recommendations");
+      if (!response.ok)
+        throw new Error("Failed to fetch recommendations");
       const result = await response.json();
       setRecommendations(result.data.slice(0, 5));
-      setShowRecommendations(true);
+      setRecommendationsOpen(true);
     } catch (error) {
       console.error("Error fetching recommendations:", error.message);
       setRecommendations([]);
-      setShowRecommendations(false);
+      setRecommendationsOpen(false);
     }
   };
 
   const handleInputChange = (e) => {
     const query = e.target.value;
+    setSearchTerm(query);
     fetchRecommendations(query);
   };
 
   const handleSearch = (e) => {
     e.preventDefault();
-    const query = inputRef.current.value.trim();
+    const query = inputRef.current?.value.trim();
     if (query) {
       navigate(`/search?q=${encodeURIComponent(query)}`);
-      setShowRecommendations(false);
-      inputRef.current.value = "";
+      setRecommendationsOpen(false);
+      setSearchTerm("");
     }
   };
 
@@ -135,58 +156,85 @@ const Header = () => {
         </div>
 
         {/* Navigation Links */}
-        <nav className="navbar-links">
-          <a href="/" onClick={(e) => linkNavbar(e, "home")}>
-            Home {links.home && <div className="lineUnder"></div>}
-          </a>
-          <a href="/About" onClick={(e) => linkNavbar(e, "about")}>
-            About {links.about && <div className="lineUnder"></div>}
-          </a>
-          <a href="/Contact" onClick={(e) => linkNavbar(e, "contact")}>
-            Contact {links.contact && <div className="lineUnder"></div>}
-          </a>
-
-          {!user && (
-            <a href="/login" onClick={(e) => linkNavbar(e, "signup")}>
-              Login {links.signup && <div className="lineUnder"></div>}
+        <div className="navbar-center">
+          <nav className="navbar-links">
+            <a href="/" onClick={(e) => linkNavbar(e, "home")}>
+              Home {links.home && <div className="lineUnder"></div>}
             </a>
-          )}
-        </nav>
+            <a href="/About" onClick={(e) => linkNavbar(e, "about")}>
+              About {links.about && <div className="lineUnder"></div>}
+            </a>
+            <a href="/Contact" onClick={(e) => linkNavbar(e, "contact")}>
+              Contact {links.contact && <div className="lineUnder"></div>}
+            </a>
+            {!user && (
+              <a href="/login" onClick={(e) => linkNavbar(e, "signup")}>
+                Login {links.signup && <div className="lineUnder"></div>}
+              </a>
+            )}
+          </nav>
+        </div>
 
-        {/* Search and Icon Options */}
+        {/* Search and Icons */}
         <div className="navbar-right">
-          <div className="input-div">
+          <div className="search-wrapper" ref={searchWrapperRef}>
             <input
               type="text"
               placeholder="Que cherchez-vous ?"
-              className="navbar-search"
+              className="modern-search-input"
               ref={inputRef}
+              value={searchTerm}
               onChange={handleInputChange}
             />
-            <img src="/src/assets/search.png" alt="search" onClick={handleSearch} />
+            {recommendationsOpen && recommendations.length > 0 && (
+              <ul className="recommendations-dropdown">
+                {recommendations.map((product) => (
+                  <li
+                    key={product._id}
+                    onClick={() => navigate(`/products/${product._id}`)}
+                  >
+                    <img
+                      src={
+                        product.image && product.image.length > 0
+                          ? product.image[0]
+                          : "https://via.placeholder.com/50x50"
+                      }
+                      alt={product.name}
+                    />
+                    <div>
+                      <p>{product.name}</p>
+                      <p>${product.price.toFixed(2)}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
-          {/* Fav-logo navigates to Seller Dashboard ONLY if logged in */}
-          {user && (
-            <MdFavoriteBorder
-              onClick={handleDashboardNavigation}
-              className="fav-logo"
-              title="Seller Dashboard"
-            />
-          )}
-
-          <MdOutlineShoppingCart className="cart-logo" />
-
-          {user ? (
-            <>
-              <MdAccountCircle
-                className="profile-logo"
-                onClick={() => navigate("/account")}
-                title="Mon Compte"
+          <div className="navbar-icons">
+            {user && (
+              <MdFavoriteBorder
+                onClick={handleDashboardNavigation}
+                className="fav-logo"
+                title="Seller Dashboard"
               />
-              <MdLogout className="logout-icon" onClick={handleLogout} title="Déconnexion" />
-            </>
-          ) : null}
+            )}
+            <MdOutlineShoppingCart className="cart-logo" />
+            {user && (
+              <>
+                <MdAccountCircle
+                  className="profile-logo"
+                  onClick={() => navigate("/AccountPage")}
+                  title="Mon Compte"
+                />
+                <MdLogout
+                  className="logout-icon"
+                  onClick={handleLogout}
+                  title="Déconnexion"
+                />
+              </>
+            )}
+          </div>
         </div>
       </header>
     </div>

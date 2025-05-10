@@ -1,11 +1,11 @@
-.container {
+.signupWrapper {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
 }
 
-.card {
+.authCard {
   display: flex;
   width: 850px;
   max-width: 100%;
@@ -14,7 +14,6 @@
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
-
 
 @keyframes slideLeft {
   from {
@@ -26,7 +25,7 @@
 }
 
 @media (max-width: 768px) {
-  .card {
+  .authCard {
     flex-direction: column;
     min-height: auto;
     width: 100%;

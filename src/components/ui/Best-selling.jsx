@@ -1,3 +1,4 @@
+// BestS.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from './Card';
@@ -15,15 +16,14 @@ function BestS() {
     const fetchProducts = async () => {
       try {
         const response = await fetch('http://localhost:5000/api/products');
-        
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-
         const result = await response.json();
         if (result.success) {
-          const sortedProducts = result.data.sort((a, b) => 
-            new Date(b.createdAt) - new Date(a.createdAt)
+          // Sort products by createdAt (most recent first)
+          const sortedProducts = result.data.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
           );
           setProducts(sortedProducts.slice(0, 4));
         } else {
@@ -44,10 +44,7 @@ function BestS() {
     <div className="sales-container">
       <div className="top-best-product-container">
         <Diviser name="This Month" title="Best Selling Products" />
-        <button 
-          className="view-all-button"
-          onClick={() => navigate('/products')}
-        >
+        <button className="view-all-button" onClick={() => navigate('/ProductListingPage')}>
           View All
         </button>
       </div>
