@@ -9,59 +9,106 @@ function Orders() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [paymentFilter, setPaymentFilter] = useState('all');
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
 
   useEffect(() => {
-    const fetchOrders = async () => {
+    const fetchAllOrders = async () => {
       try {
         const token = localStorage.getItem('token');
-        
         if (!token) {
-          window.location.href = '/commandes';
+          window.location.href = '/login';
           return;
         }
-  
+
         const response = await axios.get('http://localhost:5000/api/orders', {
           headers: {
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
           }
         });
-  
-        setOrders(response.data);
+
+        const ordersData = response.data.data || response.data;
+        setOrders(Array.isArray(ordersData) ? ordersData : []);
+        
       } catch (error) {
+        console.error('API Error:', {
+          config: error.config,
+          response: error.response,
+          message: error.message
+        });
+        
         if (error.response?.status === 401) {
           localStorage.removeItem('token');
-          window.location.href = '/commandes';
+          window.location.href = '/login';
         } else {
-          setError(error.message);
+          setError(error.response?.data?.message || 
+                 'Erreur lors de la récupération des commandes');
         }
       } finally {
         setLoading(false);
       }
     };
-  
-    fetchOrders();
+
+    fetchAllOrders();
   }, []);
 
+  const handleViewDetails = (order) => {
+    setSelectedOrder(order);
+    setShowDetailsModal(true);
+  };
+
+  const handleCancelOrder = (order) => {
+    setSelectedOrder(order);
+    setShowCancelModal(true);
+  };
+
+  const confirmCancelOrder = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(
+        `http://localhost:5000/api/orders/${selectedOrder._id}/cancel`,
+        {},
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      setOrders(orders.map(order => 
+        order._id === selectedOrder._id 
+          ? { ...order, status: 'Cancelled' } 
+          : order
+      ));
+      
+      setShowCancelModal(false);
+    } catch (error) {
+      console.error('Error cancelling order:', error);
+      setError('Erreur lors de l\'annulation de la commande');
+    }
+  };
+
   const filteredOrders = orders.filter(order => {
-    // Filtre de recherche
     const matchesSearch = 
       order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (order.user?.name && order.user.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (order.user?.email && order.user.email.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    // Filtre par statut
     const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
-    
-    // Filtre par méthode de paiement
-    const matchesPayment = paymentFilter === 'all' || order.payment?.method === paymentFilter;
+    const matchesPayment = paymentFilter === 'all' || 
+                          (order.payment && order.payment.method === paymentFilter);
     
     return matchesSearch && matchesStatus && matchesPayment;
   });
 
   const getStatusBadge = (status) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case 'delivered': return 'status-badge status-success';
-      case 'shipped': return 'status-badge status-shipped';
+      case 'shipped': 
+      case 'paid': return 'status-badge status-shipped';
       case 'processing': return 'status-badge status-preparing';
       case 'pending': return 'status-badge status-pending';
       case 'cancelled': return 'status-badge status-cancelled';
@@ -73,20 +120,27 @@ function Orders() {
     const statusMap = {
       delivered: 'Livrée',
       shipped: 'Expédiée',
+      paid: 'Payée',
       processing: 'En préparation',
       pending: 'En attente',
       cancelled: 'Annulée'
     };
-    return statusMap[status] || status;
+    return statusMap[status.toLowerCase()] || status;
   };
 
   const getPaymentMethod = (method) => {
     const paymentMap = {
       credit_card: 'Carte bancaire',
       paypal: 'PayPal',
-      bank_transfer: 'Virement bancaire'
+      bank_transfer: 'Virement bancaire',
+      cash: 'Espèces'
     };
-    return paymentMap[method] || method;
+    return paymentMap[method] || method || 'Non spécifié';
+  };
+
+  const formatDate = (dateString) => {
+    const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    return new Date(dateString).toLocaleDateString('fr-FR', options);
   };
 
   if (loading) return <div className="loading">Chargement des commandes...</div>;
@@ -95,15 +149,7 @@ function Orders() {
   return (
     <div className="orders-page">
       <div className="page-header">
-        <h1 className="page-title">Gestion des Commandes</h1>
-        <button className="button button-primary">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="button-icon">
-            <path d="M3 6L5 6M5 6L7 6M5 6V4M5 6V8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            <path d="M3 12H17" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            <path d="M3 18H13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-          </svg>
-          Filtres avancés
-        </button>
+        <h1 className="page-title">Toutes les Commandes</h1>
       </div>
       
       <div className="search-bar">
@@ -125,10 +171,11 @@ function Orders() {
           onChange={(e) => setStatusFilter(e.target.value)}
         >
           <option value="all">Tous les statuts</option>
-          <option value="delivered">Livrée</option>
-          <option value="shipped">Expédiée</option>
-          <option value="processing">En préparation</option>
-          <option value="pending">En attente</option>
+          <option value="Pending">En attente</option>
+          <option value="Paid">Payée</option>
+          <option value="Shipped">Expédiée</option>
+          <option value="Delivered">Livrée</option>
+          <option value="Cancelled">Annulée</option>
         </select>
         
         <select 
@@ -140,6 +187,7 @@ function Orders() {
           <option value="credit_card">Carte bancaire</option>
           <option value="paypal">PayPal</option>
           <option value="bank_transfer">Virement bancaire</option>
+          <option value="cash">Espèces</option>
         </select>
       </div>
       
@@ -147,27 +195,28 @@ function Orders() {
         <table className="data-table">
           <thead>
             <tr>
-              <th>Commande</th>
+              <th>ID Commande</th>
               <th>Client</th>
               <th>Date</th>
               <th>Total</th>
               <th>Statut</th>
               <th>Paiement</th>
+              <th>Vendeur(s)</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {filteredOrders.length > 0 ? (
-              filteredOrders.map(order => (
+              filteredOrders.map((order, index) => (
                 <tr key={order._id}>
                   <td>ORD-{order._id.substring(0, 6).toUpperCase()}</td>
                   <td>
-                    <div>{order.user?.name || 'Utilisateur inconnu'}</div>
+                    <div>{order.user?.name || 'Anonyme'}</div>
                     {order.user?.email && (
                       <div className="client-email">{order.user.email}</div>
                     )}
                   </td>
-                  <td>{new Date(order.createdAt).toLocaleDateString('fr-FR')}</td>
+                  <td>{formatDate(order.createdAt)}</td>
                   <td>€{order.totalAmount?.toFixed(2) || '0.00'}</td>
                   <td>
                     <span className={getStatusBadge(order.status)}>
@@ -176,19 +225,34 @@ function Orders() {
                   </td>
                   <td>{getPaymentMethod(order.payment?.method)}</td>
                   <td>
-                    <button className="action-button">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <path d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M19 13C19.5523 13 20 12.5523 20 12C20 11.4477 19.5523 11 19 11C18.4477 11 18 11.4477 18 12C18 12.5523 18.4477 13 19 13Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M5 13C5.55228 13 6 12.5523 6 12C6 11.4477 5.55228 11 5 11C4.44772 11 4 11.4477 4 12C4 12.5523 4.44772 13 5 13Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </button>
+                    {order.items?.map((item, index) => (
+                      <div key={index}>
+                        {item.seller?.name || 'Vendeur inconnu'}
+                      </div>
+                    ))}
+                  </td>
+                  <td>
+                    <div className={`dropdown ${index >= filteredOrders.length - 2 ? 'dropdown-top' : ''}`}>
+                      <button className="action-button">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                          <path d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M19 13C19.5523 13 20 12.5523 20 12C20 11.4477 19.5523 11 19 11C18.4477 11 18 11.4477 18 12C18 12.5523 18.4477 13 19 13Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M5 13C5.55228 13 6 12.5523 6 12C6 11.4477 5.55228 11 5 11C4.44772 11 4 11.4477 4 12C4 12.5523 4.44772 13 5 13Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </button>
+                      <div className="dropdown-content">
+                        <button onClick={() => handleViewDetails(order)}>Voir les détails</button>
+                        {order.status !== 'Cancelled' && order.status !== 'Delivered' && (
+                          <button onClick={() => handleCancelOrder(order)}>Annuler la commande</button>
+                        )}
+                      </div>
+                    </div>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="7" className="no-orders">
+                <td colSpan="8" className="no-orders">
                   Aucune commande trouvée
                 </td>
               </tr>
@@ -196,6 +260,80 @@ function Orders() {
           </tbody>
         </table>
       </div>
+
+      {/* Modal pour voir les détails */}
+      {showDetailsModal && selectedOrder && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div className="modal-header">
+              <h3>Détails de la commande ORD-{selectedOrder._id.substring(0, 6).toUpperCase()}</h3>
+              <button onClick={() => setShowDetailsModal(false)}>&times;</button>
+            </div>
+            <div className="modal-body">
+              <div className="order-details-section">
+                <h4>Informations client</h4>
+                <p><strong>Nom:</strong> {selectedOrder.user?.name || 'Anonyme'}</p>
+                <p><strong>Email:</strong> {selectedOrder.user?.email || 'Non spécifié'}</p>
+                <p><strong>Adresse:</strong> {selectedOrder.shippingAddress?.address || 'Non spécifié'}</p>
+              </div>
+              
+              <div className="order-details-section">
+                <h4>Articles commandés</h4>
+                <table className="order-items-table">
+                  <thead>
+                    <tr>
+                      <th>Produit</th>
+                      <th>Quantité</th>
+                      <th>Prix unitaire</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedOrder.items?.map((item, index) => (
+                      <tr key={index}>
+                        <td>{item.product?.name || 'Produit inconnu'}</td>
+                        <td>{item.quantity}</td>
+                        <td>€{item.price?.toFixed(2) || '0.00'}</td>
+                        <td>€{(item.quantity * item.price)?.toFixed(2) || '0.00'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              
+              <div className="order-details-section">
+                <h4>Résumé</h4>
+                <p><strong>Sous-total:</strong> €{selectedOrder.subTotal?.toFixed(2) || '0.00'}</p>
+                <p><strong>Frais de livraison:</strong> €{selectedOrder.shippingPrice?.toFixed(2) || '0.00'}</p>
+                <p><strong>Total:</strong> €{selectedOrder.totalAmount?.toFixed(2) || '0.00'}</p>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button onClick={() => setShowDetailsModal(false)}>Fermer</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal pour annuler la commande */}
+      {showCancelModal && selectedOrder && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div className="modal-header">
+              <h3>Annuler la commande</h3>
+              <button onClick={() => setShowCancelModal(false)}>&times;</button>
+            </div>
+            <div className="modal-body">
+              <p>Êtes-vous sûr de vouloir annuler la commande ORD-{selectedOrder._id.substring(0, 6).toUpperCase()} ?</p>
+              <p>Cette action est irréversible.</p>
+            </div>
+            <div className="modal-footer">
+              <button onClick={() => setShowCancelModal(false)}>Non, garder la commande</button>
+              <button className="danger" onClick={confirmCancelOrder}>Oui, annuler la commande</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
