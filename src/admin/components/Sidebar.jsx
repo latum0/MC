@@ -1,23 +1,20 @@
 "use client"
-import { Link, useLocation, useNavigate } from "react-router-dom"
-import "./Sidebar.css"
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import "./Sidebar.css";
 
 function Sidebar() {
-  const location = useLocation()
-  const navigate = useNavigate()
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  const isActive = (path) => {
-    return location.pathname === path ? "sidebar-item active" : "sidebar-item"
-  }
+  const isActive = (path) =>
+    location.pathname === path ? "sidebar-item active" : "sidebar-item";
 
   const handleLogout = () => {
-    // Supprimer le token et les infos utilisateur du localStorage
-    localStorage.removeItem("token")
-    localStorage.removeItem("user") // si tu stockes un objet user
-
-    // Redirection vers la page d'accueil
-    navigate("/")
-  }
+    // Remove token and user info, then navigate to home
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/");
+  };
 
   return (
     <div className="sidebar">
@@ -37,7 +34,6 @@ function Sidebar() {
       </div>
       <nav className="sidebar-nav">
         <Link to="/dashboard" className={isActive("/")}>
-          {/* Icône colorée pour Tableau de bord */}
           <svg width="20" height="20" viewBox="0 0 24 24">
             <rect x="3" y="3" width="7" height="7" rx="1" fill="#FF5252" />
             <rect x="14" y="3" width="7" height="7" rx="1" fill="#4CAF50" />
@@ -47,16 +43,23 @@ function Sidebar() {
           <span>Tableau de bord</span>
         </Link>
         <Link to="/produits" className={isActive("/produits")}>
-          {/* Icône de cube 3D pour Produits */}
           <svg width="20" height="20" viewBox="0 0 24 24">
-            <path d="M12 2L3 7L12 12L21 7L12 2Z" fill="#FFA726" />
-            <path d="M3 7V17L12 22V12L3 7Z" fill="#FB8C00" />
-            <path d="M21 7V17L12 22V12L21 7Z" fill="#EF6C00" />
+            <path
+              d="M12 2L3 7L12 12L21 7L12 2Z"
+              fill="#FFA726"
+            />
+            <path
+              d="M3 7V17L12 22V12L3 7Z"
+              fill="#FB8C00"
+            />
+            <path
+              d="M21 7V17L12 22V12L21 7Z"
+              fill="#EF6C00"
+            />
           </svg>
           <span>Produits</span>
         </Link>
         <Link to="/commandes" className={isActive("/commandes")}>
-          {/* Icône de panier pour Commandes */}
           <svg width="20" height="20" viewBox="0 0 24 24">
             <path
               d="M6 2L3 6V20C3 20.5304 3.21071 21.0391 3.58579 21.4142C3.96086 21.7893 4.46957 22 5 22H19C19.5304 22 20.0391 21.7893 20.4142 21.4142C20.7893 21.0391 21 20.5304 21 20V6L18 2H6Z"
@@ -72,7 +75,6 @@ function Sidebar() {
           <span>Commandes</span>
         </Link>
         <Link to="/clients" className={isActive("/clients")}>
-          {/* Icône de personnes pour Clients */}
           <svg width="20" height="20" viewBox="0 0 24 24">
             <circle cx="9" cy="7" r="4" fill="#7E57C2" />
             <path
@@ -88,7 +90,6 @@ function Sidebar() {
           <span>Clients</span>
         </Link>
         <Link to="/paiements" className={isActive("/paiements")}>
-          {/* Icône de carte de crédit pour Paiements */}
           <svg width="20" height="20" viewBox="0 0 24 24">
             <rect x="2" y="5" width="20" height="14" rx="2" fill="#29B6F6" />
             <rect x="2" y="9" width="20" height="3" fill="#0288D1" />
@@ -98,7 +99,6 @@ function Sidebar() {
           <span>Paiements Vendeurs</span>
         </Link>
         <Link to="/transactions" className={isActive("/transactions")}>
-          {/* Icône de graphique pour Transactions */}
           <svg width="20" height="20" viewBox="0 0 24 24">
             <rect x="2" y="12" width="4" height="8" fill="#9C27B0" />
             <rect x="8" y="8" width="4" height="12" fill="#673AB7" />
@@ -111,20 +111,31 @@ function Sidebar() {
       </nav>
       <div className="sidebar-footer">
         <div className="sidebar-item" onClick={handleLogout} style={{ cursor: "pointer" }}>
-          {/* Icône de déconnexion */}
           <svg width="20" height="20" viewBox="0 0 24 24">
             <path
               d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9"
               fill="#FF9800"
             />
-            <path d="M16 17L21 12L16 7" stroke="#E65100" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M21 12H9" stroke="#E65100" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path
+              d="M16 17L21 12L16 7"
+              stroke="#E65100"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M21 12H9"
+              stroke="#E65100"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
           <span>Déconnexion</span>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default Sidebar
+export default Sidebar;
