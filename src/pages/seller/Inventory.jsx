@@ -1,45 +1,41 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import {
-  Cuboid as CubeIcon,
-  LayoutDashboard,
-  Package,
-  Box,
-  ShoppingCart,
-  BarChart2,
-  User,
-  Search
-} from "lucide-react";
+import { useParams } from "react-router-dom";
+import SellerSidebar from "./SellerSidebar";
+import { Cuboid as CubeIcon, Box } from "lucide-react";
 import "./Inventory.css";
 
 function Inventory() {
+  const { sellerId } = useParams();
   const [searchTerm, setSearchTerm] = useState("");
   const [stockFilter, setStockFilter] = useState("all");
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Hardcoded seller ID for now
-  const sellerId = "680becbed8e2df4e5773466c";
-
-  // Fetch products from API
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/products/seller/${sellerId}`);
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("Missing authentication token");
+
+        const response = await fetch("http://localhost:5000/api/products/seller", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
         if (!response.ok) throw new Error("Failed to fetch products");
 
         const result = await response.json();
         const fetchedProducts = result.data || [];
 
-        // Convert fetched products to inventory format
-        const formattedProducts = fetchedProducts.map(product => ({
+        const formattedProducts = fetchedProducts.map((product) => ({
           id: product._id,
           name: product.name,
-          sku: product.sku || "N/A", // Add SKU field to Product model later
+          sku: product.sku || "N/A",
           stock: product.stock,
           status: getStockStatus(product.stock),
-          variants: [], // Optional: add variant logic later
+          variants: [],
         }));
 
         setProducts(formattedProducts);
@@ -54,14 +50,12 @@ function Inventory() {
     fetchProducts();
   }, [sellerId]);
 
-  // Helper: determine product status based on stock
   const getStockStatus = (stock) => {
     if (stock <= 0) return "Out of Stock";
     if (stock <= 5) return "Low Stock";
     return "In Stock";
   };
 
-  // Filter products
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
     (stockFilter === "all" ||
@@ -70,7 +64,6 @@ function Inventory() {
       (stockFilter === "out-of-stock" && product.status === "Out of Stock"))
   );
 
-  // Loading state
   if (loading) {
     return (
       <div className="dashboard-container">
@@ -82,7 +75,6 @@ function Inventory() {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <div className="dashboard-container">
@@ -95,43 +87,9 @@ function Inventory() {
 
   return (
     <div className="dashboard-container">
-      {/* Sidebar */}
-      <div className="sidebar">
-        <div className="sidebar-header">
-          <CubeIcon size={20} />
-          <span>Seller Dashboard</span>
-        </div>
-        <nav className="sidebar-nav">
-          <Link to="/" className="nav-item">
-            <LayoutDashboard size={20} />
-            <span>Dashboard</span>
-          </Link>
-          <Link to="/products" className="nav-item">
-            <Package size={20} />
-            <span>Products</span>
-          </Link>
-          <Link to="/inventory" className="nav-item active">
-            <Box size={20} />
-            <span>Inventory</span>
-          </Link>
-          <Link to="/orders" className="nav-item">
-            <ShoppingCart size={20} />
-            <span>Orders</span>
-          </Link>
-          <Link to="/analytics" className="nav-item">
-            <BarChart2 size={20} />
-            <span>Analytics</span>
-          </Link>
-          <Link to="/profile" className="nav-item">
-            <User size={20} />
-            <span>Profile</span>
-          </Link>
-        </nav>
-      </div>
+      <SellerSidebar sellerId={sellerId} />
 
-      {/* Main Content */}
       <main className="main-content">
-        {/* Header */}
         <div className="page-header">
           <div>
             <h1>Inventory</h1>
@@ -142,10 +100,8 @@ function Inventory() {
           </div>
         </div>
 
-        {/* Search and Filter */}
         <div className="filters-container">
           <div className="search-input">
-            <Search size={18} className="search-icon" />
             <input
               type="text"
               placeholder="Search inventory..."
@@ -166,7 +122,6 @@ function Inventory() {
           </div>
         </div>
 
-        {/* Inventory Table */}
         <div className="table-container">
           <table className="inventory-table">
             <thead>
@@ -187,11 +142,7 @@ function Inventory() {
                     <td>{product.sku}</td>
                     <td>{product.stock}</td>
                     <td>
-                      <span
-                        className={`badge ${product.status
-                          .toLowerCase()
-                          .replace(/\s+/g, "-")}`}
-                      >
+                      <span className={`badge ${product.status.toLowerCase().replace(/\s+/g, "-")}`}>
                         {product.status}
                       </span>
                     </td>
@@ -213,18 +164,8 @@ function Inventory() {
                           min="0"
                           defaultValue={product.stock}
                           className="stock-input"
-                          onChange={(e) => {
-                            // In real app, update via API
-                          }}
                         />
-                        <button
-                          className="update-button"
-                          onClick={() =>
-                            alert(
-                              `Update stock for ${product.name} to ${product.stock}`
-                            )
-                          }
-                        >
+                        <button className="update-button">
                           Update
                         </button>
                       </div>

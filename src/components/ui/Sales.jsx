@@ -67,6 +67,7 @@ const AllProductsSection = () => {
               star={product.rating || 0} // Default to 0 if rating is missing
               rating={product.rating || 0}
               img={product.image?.[0] || 'https://via.placeholder.com/150'} // Use the first image or a placeholder
+              sellerId={product.seller}
             />
           ))
         )}

@@ -1,8 +1,8 @@
-// Card.js
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import './Card.css';
-import StarEx from './starEx';
+// Card.jsx
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import "./Card.css";
+import StarEx from "./starEx";
 import { MdFavoriteBorder } from "react-icons/md";
 
 function Card(props) {
@@ -14,38 +14,44 @@ function Card(props) {
     setIsLiked(!isLiked);
   };
 
-  const handleAddToCart = (e) => {
+  const handleAddToCart = async (e) => {
     e.preventDefault();
     e.stopPropagation();
 
-    const token = localStorage.getItem('token');
-
+    const token = localStorage.getItem("token");
+    console.log("Clicked Add to Cart, productId:", props.id);
+    
     if (!token) {
-      // 🎨 Fake add for animation/presence only
-      setIsAdded(true);
+      setIsAdded(true); // Fake add for animation/presence only when not logged in
       return;
     }
 
-    // ✅ Real cart addition
-    fetch('http://localhost:5000/api/cart', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ productId: props.id, quantity: 1 }),
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Failed to add to cart');
+    try {
+      // Step 1: Add product to cart
+      const cartResponse = await fetch("http://localhost:5000/api/cart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ productId: props.id, quantity: 1 }),
+      });
+
+      if (!cartResponse.ok) {
+        const errorData = await cartResponse.json();
+        throw new Error(errorData.error || "Failed to add to cart");
       }
-      return response.json();
-    })
-    .catch(err => {
-      console.error('Error:', err.message);
-      alert(`Could not add to cart: ${err.message}`);
-      setIsAdded(false); // Revert on failure
-    });
+
+      const cartData = await cartResponse.json();
+      console.log("Cart response:", cartData);
+      setIsAdded(true);
+      
+      
+    } catch (err) {
+      console.error("Error:", err.message);
+      alert(`Could not complete action: ${err.message}`);
+      setIsAdded(false);
+    }
   };
 
   return (
@@ -54,16 +60,16 @@ function Card(props) {
         <div className="img-wrapper">
           <img src={props.img} alt={props.name} className="product-img" />
           <MdFavoriteBorder
-            className={`favorit ${isLiked ? 'liked' : ''}`}
+            className={`favorit ${isLiked ? "liked" : ""}`}
             onClick={handleLike}
-            aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}
+            aria-label={isLiked ? "Remove from favorites" : "Add to favorites"}
           />
           <button
-            className={`add-to-cart ${isAdded ? 'added' : ''}`}
+            className={`add-to-cart ${isAdded ? "added" : ""}`}
             onClick={handleAddToCart}
-            disabled={isAdded && !localStorage.getItem('token')}
+            disabled={isAdded && !localStorage.getItem("token")}
           >
-            {isAdded ? "✓ In Cart" : 'Add To Cart'}
+            {isAdded ? "✓ In Cart" : "Add To Cart"}
           </button>
         </div>
         <div className="product-description">

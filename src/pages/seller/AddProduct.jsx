@@ -1,268 +1,235 @@
-
-
-import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import "./AddProduct.css"
+import { useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import "./AddProduct.css";
 
 function AddProduct() {
-  const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState("general")
-  const [isLoading, setIsLoading] = useState(false)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const navigate = useNavigate();
+  const { sellerId } = useParams();
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // State to store the selected file and its preview URL
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    setIsLoading(true)
+  // Handle file input change and generate a preview
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  };
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false)
-      alert("Product added successfully!")
-      navigate("/products")
-    }, 1000)
+  // Function to upload image to Cloudinary using an unsigned upload preset
+ const uploadImageToCloudinary = async (file) => {
+  // Replace "unsigned_upload" with the actual preset name you created in Cloudinary.
+  const unsignedUploadPreset = "unsigned_upload"; 
+  const cloudName = "dxbfmrqsy"; // Your cloud name
+
+  const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", unsignedUploadPreset);
+
+  const response = await fetch(uploadUrl, {
+    method: "POST",
+    body: formData,
+  });
+  const data = await response.json();
+  
+  console.log("Cloudinary response:", data); // Check the console for details
+
+  if (data.secure_url) {
+    return data.secure_url;
+  } else if (data.error) {
+    throw new Error("Cloudinary error: " + data.error.message);
   }
+  throw new Error("Image upload failed");
+};
+
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    const form = e.target;
+    const productData = {
+      name: form.name.value,
+      description: form.description.value,
+      category: form.category.value,
+      price: parseFloat(form.price.value),
+      tags: form.tags.value
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter((tag) => tag !== ""),
+      sku: form.sku.value,
+      stock: parseInt(form.stock.value, 10),
+      image: [] // default to empty array; will update if image is uploaded
+    };
+
+    try {
+      // If an image file was selected, upload it to Cloudinary
+      if (selectedFile) {
+        const imageUrl = await uploadImageToCloudinary(selectedFile);
+        productData.image = [imageUrl];
+      }
+      
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:5000/api/products", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(productData),
+      });
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Failed to add product");
+      }
+      alert("Product added successfully!");
+      navigate(`/DashboardSeller/${sellerId}/products`);
+    } catch (error) {
+      console.error("Error adding product:", error);
+      alert("Error adding product: " + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="add-product-container">
-      {/* Sidebar */}
-      <div className="sidebar">
-        <div className="sidebar-header">
-          <div className="logo">
-            <i className="icon-package"></i>
-            <span>Seller Dashboard</span>
-          </div>
-        </div>
-        <nav className="sidebar-nav">
-          <Link to="/" className="nav-item">
-            <i className="icon-home"></i>
-            <span>Dashboard</span>
-          </Link>
-          <Link to="/products" className="nav-item active">
-            <i className="icon-package"></i>
-            <span>Products</span>
-          </Link>
-          <Link to="/inventory" className="nav-item">
-            <i className="icon-box"></i>
-            <span>Inventory</span>
-          </Link>
-          <Link to="/orders" className="nav-item">
-            <i className="icon-shopping-cart"></i>
-            <span>Orders</span>
-          </Link>
-          <Link to="/analytics" className="nav-item">
-            <i className="icon-bar-chart"></i>
-            <span>Analytics</span>
-          </Link>
-          <Link to="/profile" className="nav-item">
-            <i className="icon-user"></i>
-            <span>Profile</span>
-          </Link>
-        </nav>
-      </div>
-
-      {/* Mobile Menu */}
-      {/* <div className={`mobile-menu ${mobileMenuOpen ? "open" : ""}`}>
-        <div className="mobile-menu-header">
-          <Link to="/" className="logo" onClick={() => setMobileMenuOpen(false)}>
-            <Package size={24} />
-            <span>Seller Dashboard</span>
-          </Link>
-          <button className="close-menu" onClick={() => setMobileMenuOpen(false)}>
-            <X size={24} />
-          </button>
-        </div>
-        <nav className="mobile-nav">
-          <Link to="/" className="nav-item" onClick={() => setMobileMenuOpen(false)}>
-            <Home size={18} />
-            <span>Dashboard</span>
-          </Link>
-          <Link to="/products" className="nav-item active" onClick={() => setMobileMenuOpen(false)}>
-            <Package size={18} />
-            <span>Products</span>
-          </Link>
-          <Link to="/inventory" className="nav-item" onClick={() => setMobileMenuOpen(false)}>
-            <Box size={18} />
-            <span>Inventory</span>
-          </Link>
-          <Link to="/orders" className="nav-item" onClick={() => setMobileMenuOpen(false)}>
-            <ShoppingCart size={18} />
-            <span>Orders</span>
-          </Link>
-          <Link to="/analytics" className="nav-item" onClick={() => setMobileMenuOpen(false)}>
-            <BarChart3 size={18} />
-            <span>Analytics</span>
-          </Link>
-          <Link to="/profile" className="nav-item" onClick={() => setMobileMenuOpen(false)}>
-            <User size={18} />
-          </Link>
-        </nav>
-      </div> */}
-
-      {/* Main Content */}
       <main className="main-content">
         {/* Header */}
         <div className="page-header">
           <div>
             <h1>Add New Product</h1>
-            <p>Create a new product with details and inventory information</p>
+            <p>Enter product details below to add a new product</p>
           </div>
         </div>
 
-        {/* Add Product Form */}
+        {/* Single Tab Form */}
         <form onSubmit={handleSubmit} className="add-product-form">
-          {/* Tabs */}
-          <div className="form-tabs">
-            <button
-              type="button"
-              className={activeTab === "general" ? "active" : ""}
-              onClick={() => setActiveTab("general")}
-            >
-              General
-            </button>
-            <button
-              type="button"
-              className={activeTab === "inventory" ? "active" : ""}
-              onClick={() => setActiveTab("inventory")}
-            >
-              Inventory
-            </button>
-            <button
-              type="button"
-              className={activeTab === "images" ? "active" : ""}
-              onClick={() => setActiveTab("images")}
-            >
-              Images
-            </button>
-          </div>
-
-          {/* General Tab */}
-          <div className={`tab-content ${activeTab === "general" ? "active" : ""}`}>
-            <div className="card">
-              <div className="card-header">
-                <h3>General Information</h3>
-                <p>Enter the basic details of your product</p>
+          <div className="card">
+            <div className="card-header">
+              <h3>Product Information</h3>
+            </div>
+            <div className="card-content">
+              <div className="form-group">
+                <label htmlFor="name">Product Name</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  placeholder="Enter product name"
+                  required
+                />
               </div>
-              <div className="card-content">
+              <div className="form-group">
+                <label htmlFor="description">Description</label>
+                <textarea
+                  id="description"
+                  name="description"
+                  placeholder="Enter product description"
+                  rows="4"
+                ></textarea>
+              </div>
+              <div className="form-group">
+                <label htmlFor="category">Category</label>
+                <select id="category" name="category" required>
+                  <option value="">Select category</option>
+                  <option value="electronics">Electronics</option>
+                  <option value="clothing">Clothing</option>
+                  <option value="accessories">Accessories</option>
+                  <option value="home">Home & Kitchen</option>
+                  <option value="beauty">Beauty & Personal Care</option>
+                </select>
+              </div>
+              <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="name">Product Name</label>
-                  <input type="text" id="name" placeholder="Enter product name" required />
+                  <label htmlFor="price">Price ($)</label>
+                  <input
+                    type="number"
+                    id="price"
+                    name="price"
+                    placeholder="0.00"
+                    step="0.01"
+                    min="0"
+                    required
+                  />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="description">Description</label>
-                  <textarea id="description" placeholder="Enter product description" rows="4"></textarea>
+                  <label htmlFor="stock">Stock Quantity</label>
+                  <input
+                    type="number"
+                    id="stock"
+                    name="stock"
+                    placeholder="0"
+                    min="0"
+                    required
+                  />
                 </div>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="category">Category</label>
-                    <select id="category">
-                      <option value="">Select category</option>
-                      <option value="electronics">Electronics</option>
-                      <option value="clothing">Clothing</option>
-                      <option value="accessories">Accessories</option>
-                      <option value="home">Home & Kitchen</option>
-                      <option value="beauty">Beauty & Personal Care</option>
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="price">Price ($)</label>
-                    <input type="number" id="price" placeholder="0.00" step="0.01" min="0" required />
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="tags">Tags</label>
-                  <input type="text" id="tags" placeholder="Enter tags separated by commas" />
-                </div>
+              </div>
+              <div className="form-group">
+                <label htmlFor="tags">Tags</label>
+                <input
+                  type="text"
+                  id="tags"
+                  name="tags"
+                  placeholder="Enter tags separated by commas"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="sku">SKU</label>
+                <input
+                  type="text"
+                  id="sku"
+                  name="sku"
+                  placeholder="Enter SKU"
+                />
+              </div>
+
+              {/* Image Upload Section */}
+              <div className="form-group">
+                <label htmlFor="image">Product Image (optional)</label>
+                <input
+                  type="file"
+                  id="image"
+                  name="image"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                />
+                {previewUrl && (
+                  <img
+                    src={previewUrl}
+                    alt="Preview"
+                    style={{ maxWidth: "200px", marginTop: "10px" }}
+                  />
+                )}
               </div>
             </div>
           </div>
 
-          {/* Inventory Tab */}
-          <div className={`tab-content ${activeTab === "inventory" ? "active" : ""}`}>
-            <div className="card">
-              <div className="card-header">
-                <h3>Inventory Information</h3>
-                <p>Manage your product inventory and variants</p>
-              </div>
-              <div className="card-content">
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="sku">SKU</label>
-                    <input type="text" id="sku" placeholder="Enter SKU" />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="stock">Stock Quantity</label>
-                    <input type="number" id="stock" placeholder="0" min="0" required />
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label>Product Variants</label>
-                  <div className="variant-card">
-                    <div className="variant-card-header">
-                      <h4>Add Variants</h4>
-                    </div>
-                    <div className="variant-card-content">
-                      <div className="form-row">
-                        <div className="form-group">
-                          <label htmlFor="variant-type">Variant Type</label>
-                          <select id="variant-type">
-                            <option value="">Select type</option>
-                            <option value="color">Color</option>
-                            <option value="size">Size</option>
-                            <option value="material">Material</option>
-                            <option value="style">Style</option>
-                          </select>
-                        </div>
-                        <div className="form-group">
-                          <label htmlFor="variant-value">Variant Value</label>
-                          <input type="text" id="variant-value" placeholder="Enter value" />
-                        </div>
-                      </div>
-                      <button type="button" className="btn btn-outline">
-                        Add Variant
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Images Tab */}
-          <div className={`tab-content ${activeTab === "images" ? "active" : ""}`}>
-            <div className="card">
-              <div className="card-header">
-                <h3>Product Images</h3>
-                <p>Upload images of your product</p>
-              </div>
-              <div className="card-content">
-                <div className="image-upload-container">
-                  <div className="image-upload-area">
-                    <div className="upload-icon">
-                      <i className="icon-image"></i>
-                    </div>
-                    <div className="upload-text">
-                      <p>Drag & Drop files</p>
-                      <span>or click to browse</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Form Actions */}
           <div className="form-actions">
-            <Link to="/products" className="btn btn-outline">
+            <Link
+              to={`/DashboardSeller/${sellerId}/products`}
+              className="btn btn-outline"
+            >
               Cancel
             </Link>
-            <button type="submit" className="btn btn-primary" disabled={isLoading}>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={isLoading}
+            >
               {isLoading ? "Adding..." : "Add Product"}
             </button>
           </div>
         </form>
       </main>
     </div>
-  )
+  );
 }
 
-export default AddProduct
+export default AddProduct;
