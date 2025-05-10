@@ -1,10 +1,10 @@
-
-import { useState } from "react"
-import { Link } from "react-router-dom"
-import "./AdminProfile.css"
+import { useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import "./AdminProfile.css";
 import "./AdminStyles.css";
 
 function AdminProfile() {
+  const { sellerId } = useParams(); // Extract sellerId from URL
   const [sellerInfo, setSellerInfo] = useState({
     name: "John Doe",
     email: "john.doe@example.com",
@@ -17,26 +17,26 @@ function AdminProfile() {
     routingNumber: "****8901",
     paypalEmail: "john.business@example.com",
     stripeConnected: true,
-  })
+  });
 
-  const [editing, setEditing] = useState(false)
-  const [formData, setFormData] = useState(sellerInfo)
+  const [editing, setEditing] = useState(false);
+  const [formData, setFormData] = useState(sellerInfo);
 
   const handleChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFormData({
       ...formData,
       [name]: value,
-    })
-  }
+    });
+  };
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    setSellerInfo(formData)
-    setEditing(false)
+    e.preventDefault();
+    setSellerInfo(formData);
+    setEditing(false);
     // In a real app, you would save this to a backend
-    alert("Profile updated successfully!")
-  }
+    alert("Profile updated successfully!");
+  };
 
   return (
     <div className="profile-page">
@@ -46,7 +46,8 @@ function AdminProfile() {
           <p>Manage your seller information and payment methods</p>
         </div>
         <div className="header-actions">
-          <Link to="/" className="back-button">
+          {/* Updated Link to dynamically redirect to the seller dashboard */}
+          <Link to={`/DashboardSeller/${sellerId}`} className="back-button">
             Back to Dashboard
           </Link>
         </div>
@@ -116,8 +117,8 @@ function AdminProfile() {
                   type="button"
                   className="cancel-button"
                   onClick={() => {
-                    setEditing(false)
-                    setFormData(sellerInfo)
+                    setEditing(false);
+                    setFormData(sellerInfo);
                   }}
                 >
                   Cancel
@@ -223,7 +224,7 @@ function AdminProfile() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default AdminProfile
+export default AdminProfile;

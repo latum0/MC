@@ -1,94 +1,44 @@
-"use client"
+import { createContext, useContext, useState, useEffect } from "react";
 
-import { createContext, useState, useEffect, useContext } from "react"
-import authService from "../services/authService.jx"
-
-
-const AuthContext = createContext()
+const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Vérifier si l'utilisateur est déjà connecté
-    const currentUser = authService.getCurrentUser()
-    if (currentUser) {
-      setUser(currentUser)
+    const token = localStorage.getItem("token");
+    const storedUser = localStorage.getItem("user");
+    
+    if (token && storedUser) {
+      setUser(JSON.parse(storedUser));
     }
-    setLoading(false)
-  }, [])
+    setLoading(false);
+  }, []);
 
-  const register = async (userData) => {
-    try {
-      setLoading(true)
-      setError(null)
-      const data = await authService.register(userData)
-      setUser(data.utilisateur)
-      return data
-    } catch (err) {
-      setError(err.error || "Erreur lors de l'inscription")
-      throw err
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const login = async (credentials) => {
-    try {
-      setLoading(true)
-      setError(null)
-      const data = await authService.login(credentials)
-      setUser(data.utilisateur)
-      return data
-    } catch (err) {
-      setError(err.error || "Erreur lors de la connexion")
-      throw err
-    } finally {
-      setLoading(false)
-    }
-  }
+  const login = (userData, token) => {
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(userData));
+    setUser(userData);
+  };
 
   const logout = () => {
-    authService.logout()
-    setUser(null)
-  }
-
-  const updateProfile = async (userData) => {
-    try {
-      setLoading(true)
-      setError(null)
-      const updatedUser = await authService.updateProfile(userData)
-      setUser(updatedUser)
-      return updatedUser
-    } catch (err) {
-      setError(err.error || "Erreur lors de la mise à jour du profil")
-      throw err
-    } finally {
-      setLoading(false)
-    }
-  }
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+  };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        error,
-        register,
-        login,
-        logout,
-        updateProfile,
-        isAuthenticated: !!user,
-        isAdmin: user?.role === "admin",
-      }}
-    >
-      {children}
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
+      {!loading && children}
     </AuthContext.Provider>
-  )
-}
+  );
+};
 
-export const useAuth = () => useContext(AuthContext)
-
-export default AuthContext
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within AuthProvider");
+  }
+  return context;
+};

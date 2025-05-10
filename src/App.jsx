@@ -1,3 +1,4 @@
+// App.jsx
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 
 import Home from "./pages/Home";
@@ -13,13 +14,24 @@ import Header from "./components/ui/Header";
 import Footer from "./components/ui/Footer";
 import PrivateAdminRoute from "./components/ui/PrivateAdminRoute";
 
+// Admin Components
 import AdminLayout from "./admin/components/AdminLayout";
-import Dashboard from "./admin/pages/Dashboard";
-import Products from "./admin/pages/Products";
-import Orders from "./admin/pages/Orders";
-import Clients from "./admin/pages/Clients";
-import Payments from "./admin/pages/Payments";
-import Transactions from "./admin/pages/Transactions";
+import AdminDashboard from "./admin/pages/Dashboard";
+import ProductsAdmin from "./admin/pages/Products";
+import OrdersAdmin from "./admin/pages/Orders";
+import ClientsAdmin from "./admin/pages/Clients";
+import PaymentsAdmin from "./admin/pages/Payments";
+import TransactionsAdmin from "./admin/pages/Transactions";
+
+// Seller Components
+import DashboardSeller from "./pages/seller/DashboardSeller";
+import ProductManagement from "./pages/seller/EditProduct";
+import InventoryManagement from "./pages/seller/Inventory";
+import OrderManagement from "./pages/seller/Orders";
+import Analytics from "./pages/seller/Analytics";
+import ProfileManagement from "./pages/seller/AdminProfile";
+import SellerProducts from "./pages/seller/SellerProducts";
+import AddProduct from "./pages/seller/AddProduct";
 
 import "./App.css";
 
@@ -35,14 +47,16 @@ function LayoutWrapper() {
     "/transactions"
   ];
 
-  const isAdminRoute = adminPaths.some((path) =>
-    location.pathname.startsWith(path)
-  );
+  // Seller pages include any path starting with "/DashboardSeller"
+  const sellerPaths = ["/DashboardSeller"];
+  
+  const hideHeaderFooter =
+    adminPaths.some((path) => location.pathname.startsWith(path)) ||
+    sellerPaths.some((path) => location.pathname.startsWith(path));
 
   return (
     <>
-      {!isAdminRoute && <Header />}
-
+      {!hideHeaderFooter && <Header />}
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
@@ -54,24 +68,33 @@ function LayoutWrapper() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/AccountPage" element={<AccountPage />} />
 
+        {/* Seller Routes (Dynamic using sellerId) */}
+        {/* Seller Routes (Dynamic using sellerId) */}
+<Route path="/DashboardSeller/:sellerId/*">
+  <Route index element={<DashboardSeller />} />
+  <Route path="products" element={<SellerProducts />} />
+  <Route path="inventory" element={<InventoryManagement />} />
+  <Route path="orders" element={<OrderManagement />} />
+  <Route path="analytics" element={<Analytics />} /> {/* Ensure Analytics works */}
+  <Route path="profile" element={<ProfileManagement />} />
+  <Route path="addProduct" element={<AddProduct />} />
+</Route>
+
+
+        {/* Optionally, a separate route for SellerProducts if you need it */}
+       <Route path="Editproducts" element={<ProductManagement />} />
+
         {/* Admin Routes (Protected) */}
-        <Route
-          element={
-            <PrivateAdminRoute>
-              <AdminLayout />
-            </PrivateAdminRoute>
-          }
-        >
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/produits" element={<Products />} />
-          <Route path="/commandes" element={<Orders />} />
-          <Route path="/clients" element={<Clients />} />
-          <Route path="/paiements" element={<Payments />} />
-          <Route path="/transactions" element={<Transactions />} />
+        <Route element={<PrivateAdminRoute><AdminLayout /></PrivateAdminRoute>}>
+          <Route path="/dashboard" element={<AdminDashboard />} />
+          <Route path="/produits" element={<ProductsAdmin />} />
+          <Route path="/commandes" element={<OrdersAdmin />} />
+          <Route path="/clients" element={<ClientsAdmin />} />
+          <Route path="/paiements" element={<PaymentsAdmin />} />
+          <Route path="/transactions" element={<TransactionsAdmin />} />
         </Route>
       </Routes>
-
-      {!isAdminRoute && <Footer />}
+      {!hideHeaderFooter && <Footer />}
     </>
   );
 }
