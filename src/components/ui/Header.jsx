@@ -168,14 +168,14 @@ const Header = () => {
 
           {/* Fav-logo navigates to Seller Dashboard ONLY if logged in */}
           {user && (
-            <MdFavoriteBorder
-              onClick={handleDashboardNavigation}
-              className="fav-logo"
-              title="Seller Dashboard"
-            />
+            <MdOutlineShoppingCart
+  className="cart-logo"
+  onClick={() => navigate("/cart")}
+  title="Panier"
+/>
           )}
 
-          <MdOutlineShoppingCart className="cart-logo" />
+          
 
           {user ? (
             <>

@@ -9,6 +9,7 @@ import ResetPassword from "./pages/ResetPassword";
 import Contact from "./pages/Contact";
 import About from "./pages/About";
 import AccountPage from "./pages/AccountPage";
+import Cart from "./pages/Cart";
 
 import Header from "./components/ui/Header";
 import Footer from "./components/ui/Footer";
@@ -60,6 +61,7 @@ function LayoutWrapper() {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
+        <Route path="/cart" element={<Cart />} />
         <Route path="/products/:id" element={<Product />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/about" element={<About />} />
