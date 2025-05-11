@@ -1,14 +1,14 @@
-.container { 
+.loginWrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: calc(100vh - 160px); 
+  min-height: calc(100vh - 160px);
   background: linear-gradient(120deg, #dfe9f3, #ffffff);
   padding: 20px;
-  margin-top: 60px; 
+  margin-top: 60px;
 }
 
-.card {
+.authCard {
   display: flex;
   flex-direction: row;
   background: white;
@@ -21,22 +21,20 @@
   animation: fadeIn 0.8s ease;
 }
 
-.forgot-password-link {
+.passwordRecoveryLink {
   text-align: center;
   margin-top: 10px;
 }
 
-.forgot-password-link a {
+.passwordRecoveryLink a {
   text-decoration: none;
   color: #007bff;
   font-size: 14px;
 }
 
-.forgot-password-link a:hover {
+.passwordRecoveryLink a:hover {
   text-decoration: underline;
 }
-
-
 
 @keyframes slideRight {
   from {
@@ -48,7 +46,7 @@
 }
 
 @media (max-width: 768px) {
-  .card {
+  .authCard {
     flex-direction: column;
     min-height: auto;
     border-radius: 12px;

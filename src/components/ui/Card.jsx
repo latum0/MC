@@ -20,7 +20,7 @@ function Card(props) {
 
     const token = localStorage.getItem("token");
     console.log("Clicked Add to Cart, productId:", props.id);
-    
+
     if (!token) {
       setIsAdded(true); // Fake add for animation/presence only when not logged in
       return;
@@ -45,8 +45,6 @@ function Card(props) {
       const cartData = await cartResponse.json();
       console.log("Cart response:", cartData);
       setIsAdded(true);
-      
-      
     } catch (err) {
       console.error("Error:", err.message);
       alert(`Could not complete action: ${err.message}`);
@@ -55,30 +53,30 @@ function Card(props) {
   };
 
   return (
-    <Link to={`/products/${props.id}`} className="card-link">
-      <div className="card-container">
-        <div className="img-wrapper">
-          <img src={props.img} alt={props.name} className="product-img" />
+    <Link to={`/products/${props.id}`} className="product-card-link">
+      <div className="product-card">
+        <div className="image-wrapper">
+          <img src={props.img} alt={props.name} className="item-image" />
           <MdFavoriteBorder
-            className={`favorit ${isLiked ? "liked" : ""}`}
+            className={`favorite-icon ${isLiked ? "liked" : ""}`}
             onClick={handleLike}
             aria-label={isLiked ? "Remove from favorites" : "Add to favorites"}
           />
           <button
-            className={`add-to-cart ${isAdded ? "added" : ""}`}
+            className={`cart-button ${isAdded ? "added" : ""}`}
             onClick={handleAddToCart}
             disabled={isAdded && !localStorage.getItem("token")}
           >
             {isAdded ? "✓ In Cart" : "Add To Cart"}
           </button>
         </div>
-        <div className="product-description">
-          <p className="product-name">{props.name}</p>
-          <div className="price-rating">
-            <p className="price-card">${props.price}</p>
-            <div className="star-container">
+        <div className="description-section">
+          <p className="product-title">{props.name}</p>
+          <div className="price-info">
+            <p className="price-label">${props.price}</p>
+            <div className="rating-wrapper">
               <StarEx rating={props.star} />
-              <p>({props.rating})</p>
+              <span>({props.rating})</span>
             </div>
           </div>
         </div>

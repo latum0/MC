@@ -1,4 +1,6 @@
+// AllProductsSection.jsx
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Card from './Card';
 import './AllProductsSection.css';
 import Diviser from './Diviser';
@@ -7,13 +9,13 @@ const AllProductsSection = () => {
   const [products, setProducts] = useState([]); // State to store fetched products
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   // Fetch products from the backend
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await fetch('http://localhost:5000/api/products');
-        
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -46,7 +48,9 @@ const AllProductsSection = () => {
       {/* Section Header */}
       <div className="section-header">
         <h2>Explore Our Products</h2>
-        <button className="view-all-button">View All</button>
+        <button className="view-all-button" onClick={() => navigate("/ProductListingPage")}>
+          View All
+        </button>
       </div>
 
       {/* Products Grid */}
@@ -66,7 +70,11 @@ const AllProductsSection = () => {
               price={product.salePrice || product.price} // Use salePrice if available
               star={product.rating || 0} // Default to 0 if rating is missing
               rating={product.rating || 0}
-              img={product.image  ?.[0] || 'https://via.placeholder.com/150'} // Use the first image or a placeholder
+              img={
+                product.image && Array.isArray(product.image)
+                  ? product.image[0]
+                  : product.image || 'https://via.placeholder.com/150'
+              }
             />
           ))
         )}

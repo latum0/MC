@@ -10,7 +10,7 @@ import Contact from "./pages/Contact";
 import About from "./pages/About";
 import AccountPage from "./pages/AccountPage";
 import Cart from "./pages/Cart";
-
+import ProductListingPage from "./pages/ProductListingPage";
 import Header from "./components/ui/Header";
 import Footer from "./components/ui/Footer";
 import PrivateAdminRoute from "./components/ui/PrivateAdminRoute";
@@ -69,22 +69,21 @@ function LayoutWrapper() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/AccountPage" element={<AccountPage />} />
+        <Route path="/ProductListingPage" element={<ProductListingPage />} />
 
         {/* Seller Routes (Dynamic using sellerId) */}
-        {/* Seller Routes (Dynamic using sellerId) */}
-<Route path="/DashboardSeller/:sellerId/*">
-  <Route index element={<DashboardSeller />} />
-  <Route path="products" element={<SellerProducts />} />
-  <Route path="inventory" element={<InventoryManagement />} />
-  <Route path="orders" element={<OrderManagement />} />
-  <Route path="analytics" element={<Analytics />} /> {/* Ensure Analytics works */}
-  <Route path="profile" element={<ProfileManagement />} />
-  <Route path="addProduct" element={<AddProduct />} />
-</Route>
-
+        <Route path="/DashboardSeller/:sellerId/*">
+          <Route index element={<DashboardSeller />} />
+          <Route path="products" element={<SellerProducts />} />
+          <Route path="inventory" element={<InventoryManagement />} />
+          <Route path="orders" element={<OrderManagement />} />
+          <Route path="analytics" element={<Analytics />} />
+          <Route path="profile" element={<ProfileManagement />} />
+          <Route path="addProduct" element={<AddProduct />} />
+        </Route>
 
         {/* Optionally, a separate route for SellerProducts if you need it */}
-       <Route path="Editproducts" element={<ProductManagement />} />
+        <Route path="Editproducts" element={<ProductManagement />} />
 
         {/* Admin Routes (Protected) */}
         <Route element={<PrivateAdminRoute><AdminLayout /></PrivateAdminRoute>}>

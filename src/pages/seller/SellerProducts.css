@@ -20,12 +20,13 @@ html, body {
 
 /* ---------- Main Content ---------- */
 .main-content {
-  width: 80%;
-  margin-left: 80px;
+  width: 100%;
+  max-width: calc(100vw - 80px); /* Prevent overflow */
+  margin: 80px auto 0 auto; /* Top + horizontal centering */
   padding: 40px;
   background: #fff;
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* ---------- Page Header ---------- */
