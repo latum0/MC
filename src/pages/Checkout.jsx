@@ -1,11 +1,25 @@
 "use client"
 
 import { useState } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
 import "./Checkout.css"
-import { DollarSign } from 'lucide-react'
 
 const Checkout = () => {
-  // État pour le formulaire
+  const location = useLocation()
+  const navigate = useNavigate()
+  const { cartItems = [], total = 0 } = location.state || {}
+
+  if (!location.state || cartItems.length === 0) {
+    return (
+      <div className="checkout-page">
+        <div className="empty-cart-warning">
+          <h2>Votre panier est vide</h2>
+          <button onClick={() => navigate("/cart")}>Retour au panier</button>
+        </div>
+      </div>
+    )
+  }
+
   const [formData, setFormData] = useState({
     city: "",
     phoneNumber: "",
@@ -14,13 +28,11 @@ const Checkout = () => {
     paymentMethod: "card",
   })
 
-  // État pour la carte sélectionnée
   const [selectedCard, setSelectedCard] = useState("visa")
-
-  // État pour le code promo
   const [couponCode, setCouponCode] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState(null)
 
-  // Gérer les changements dans le formulaire
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target
     setFormData({
@@ -29,46 +41,91 @@ const Checkout = () => {
     })
   }
 
-  // Gérer le changement de méthode de paiement
   const handlePaymentMethodChange = (method) => {
-    setFormData({
-      ...formData,
-      paymentMethod: method,
-    })
+    setFormData({ ...formData, paymentMethod: method })
   }
 
-  // Gérer la sélection de carte
   const handleCardSelection = (card) => {
     setSelectedCard(card)
   }
 
-  // Gérer la soumission du formulaire
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    // Ici, vous pourriez envoyer les données à votre API
-    console.log("Données du formulaire:", formData)
-    console.log("Carte sélectionnée:", selectedCard)
-    alert("Commande passée avec succès!")
-  }
-
-  // Gérer l'application du code promo
   const handleApplyCoupon = () => {
     if (couponCode.trim() === "") {
       alert("Veuillez entrer un code promo")
       return
     }
-
-    // Ici, vous pourriez vérifier le code promo avec votre API
     alert(`Code promo "${couponCode}" appliqué!`)
   }
 
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  setIsSubmitting(true);
+
+  try {
+    // 1. Préparation des données
+    const orderItems = cartItems.map(item => ({
+      product: item.product._id,
+      quantity: item.quantity,
+      priceAtPurchase: item.product.price,
+      seller: item.product.seller
+    }));
+
+    // 2. Envoi à l'API avec l'URL directe
+    const response = await fetch('http://localhost:5000/api/orders', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify({
+        items: orderItems,
+        shippingInfo: {
+          city: formData.city,
+          phone: formData.phoneNumber,
+          email: formData.email
+        },
+        paymentMethod: formData.paymentMethod
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.error || "Erreur inconnue");
+
+    // 3. Vérification en base de données
+    const verification = await fetch(`http://localhost:5000/api/orders/${data.orderId}`, {
+  headers: {
+    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+  }
+});
+    const verifiedOrder = await verification.json();
+
+    if (!verification.ok || !verifiedOrder) {
+      throw new Error("La commande n'a pas été trouvée en base de données");
+    }
+
+    alert("Commande passée avec succès!");
+    navigate(`/`);
+
+  } catch (error) {
+    console.error("Erreur complète:", error);
+    alert(`Échec de la commande: ${error.message}`);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
   return (
     <div className="checkout-page">
       <div className="checkout-container">
         <div className="checkout-grid">
-          {/* Formulaire de commande */}
           <div className="order-form">
             <h1 className="page-title">Passer une commande</h1>
+            
+            {error && (
+              <div className="error-message">
+                <p>{error}</p>
+              </div>
+            )}
 
             <form onSubmit={handleSubmit}>
               <div className="form-group">
@@ -126,7 +183,6 @@ const Checkout = () => {
             </form>
           </div>
 
-          {/* Résumé de la commande */}
           <div className="order-summary">
             <div className="summary-item">
               <span>Livraison:</span>
@@ -135,12 +191,11 @@ const Checkout = () => {
 
             <div className="summary-item total">
               <span>Total:</span>
-              <span className="summary-value">1750 €</span>
+              <span className="summary-value">{total.toFixed(2)} €</span>
             </div>
 
             <div className="payment-section">
               <h2>Méthode de paiement</h2>
-
               <div className="payment-options">
                 <div className="payment-option">
                   <div className="payment-radio">
@@ -174,8 +229,6 @@ const Checkout = () => {
                       <div className="card-logo mastercard"></div>
                       <span className="card-name">Mastercard</span>
                     </button>
-
-                    
                   </div>
                 )}
 
@@ -189,7 +242,6 @@ const Checkout = () => {
                       onChange={() => handlePaymentMethodChange("cash")}
                     />
                     <label htmlFor="cash-payment">
-                      
                       Paiement à la livraison
                     </label>
                   </div>
@@ -203,13 +255,21 @@ const Checkout = () => {
                   value={couponCode}
                   onChange={(e) => setCouponCode(e.target.value)}
                 />
-                <button className="apply-coupon" onClick={handleApplyCoupon}>
+                <button 
+                  className="apply-coupon" 
+                  onClick={handleApplyCoupon}
+                  type="button"
+                >
                   Appliquer
                 </button>
               </div>
 
-              <button className="place-order-btn" onClick={handleSubmit}>
-                Passer la commande
+              <button 
+                className="place-order-btn" 
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Traitement..." : "Passer la commande"}
               </button>
             </div>
           </div>

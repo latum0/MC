@@ -61,38 +61,47 @@ const Cart = () => {
   }
 
   const updateQuantity = async (productId, newQuantity) => {
-    if (newQuantity < 1) return
+  if (newQuantity < 1) return
 
-    try {
-      const token = localStorage.getItem('token')
-      let headers = { 'Content-Type': 'application/json' }
-      if (token) headers['Authorization'] = `Bearer ${token}`
+  try {
+    const token = localStorage.getItem('token')
+    let headers = { 'Content-Type': 'application/json' }
+    if (token) headers['Authorization'] = `Bearer ${token}`
 
-      if (token) {
-        const response = await fetch('http://localhost:5000/api/cart', {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({
-            productId,
-            quantity: newQuantity
-          })
+    if (token) {
+      const response = await fetch('http://localhost:5000/api/cart', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          productId,
+          quantity: newQuantity
         })
+      })
 
-        if (!response.ok) throw new Error('Failed to update quantity')
-
-        const data = await response.json()
-        if (data.items) setCart(data)
-      } else {
-        const updatedItems = cart.items.map(item =>
-          item.product._id === productId ? { ...item, quantity: newQuantity } : item
+      if (!response.ok) throw new Error('Failed to update quantity')
+      
+      // Mise à jour locale de l'élément concerné sans toucher aux autres
+      setCart(prevCart => {
+        const updatedItems = prevCart.items.map(item =>
+          item.product._id === productId
+            ? { ...item, quantity: newQuantity }
+            : item
         )
-        setCart({ ...cart, items: updatedItems })
-        localStorage.setItem('guestCart', JSON.stringify(updatedItems))
-      }
-    } catch (error) {
-      console.error("Update quantity error:", error)
+        return { ...prevCart, items: updatedItems }
+      })
+    } else {
+      const updatedItems = cart.items.map(item =>
+        item.product._id === productId
+          ? { ...item, quantity: newQuantity }
+          : item
+      )
+      setCart({ ...cart, items: updatedItems })
+      localStorage.setItem('guestCart', JSON.stringify(updatedItems))
     }
+  } catch (error) {
+    console.error("Update quantity error:", error)
   }
+}
 
   const removeItem = async (productId) => {
     try {
@@ -122,30 +131,32 @@ const Cart = () => {
   }
 
   const clearCart = async () => {
-    if (!window.confirm("Êtes-vous sûr de vouloir vider votre panier ?")) return
+  if (!window.confirm("Êtes-vous sûr de vouloir vider votre panier ?")) return
 
-    try {
-      const token = localStorage.getItem('token')
-      let headers = { 'Content-Type': 'application/json' }
-      if (token) headers['Authorization'] = `Bearer ${token}`
+  try {
+    const token = localStorage.getItem('token')
+    let headers = { 'Content-Type': 'application/json' }
+    if (token) headers['Authorization'] = `Bearer ${token}`
 
-      if (token) {
-        const response = await fetch('http://localhost:5000/api/cart', {
-          method: 'DELETE',
-          headers
-        })
+    if (token) {
+      // Suppression de tous les articles (back doit gérer ce cas sans body)
+      const response = await fetch('http://localhost:5000/api/cart/clear', {
+        method: 'DELETE',
+        headers
+      })
 
-        if (!response.ok) throw new Error('Failed to clear cart')
+      if (!response.ok) throw new Error('Échec lors du vidage du panier')
 
-        setCart({ items: [] })
-      } else {
-        setCart({ items: [] })
-        localStorage.removeItem('guestCart')
-      }
-    } catch (error) {
-      console.error("Clear cart error:", error)
+      setCart({ items: [] })
+    } else {
+      setCart({ items: [] })
+      localStorage.removeItem('guestCart')
     }
+  } catch (error) {
+    console.error("Clear cart error:", error)
   }
+}
+
 
   const subtotal = cart.items.reduce((sum, item) => sum + item.product.price * item.quantity, 0)
   const tax = subtotal * 0.2
@@ -291,7 +302,17 @@ const Cart = () => {
                 </div>
               </div>
 
-              <button className="checkout-button">Passer la commande</button>
+              <button
+  className="checkout-button"
+  onClick={() => navigate("/Checkout", { 
+    state: { 
+      cartItems: cart.items,
+      total: total // Ajouter le total ici
+    } 
+  })}
+>
+  Passer la commande
+</button>
 
               <div className="payment-methods">
                 <p>Méthodes de paiement acceptées:</p>

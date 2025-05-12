@@ -14,6 +14,7 @@ import ProductListingPage from "./pages/ProductListingPage";
 import Header from "./components/ui/Header";
 import Footer from "./components/ui/Footer";
 import PrivateAdminRoute from "./components/ui/PrivateAdminRoute";
+import Checkout from "./pages/Checkout";
 
 // Admin Components
 import AdminLayout from "./admin/components/AdminLayout";
@@ -62,6 +63,7 @@ function LayoutWrapper() {
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/Checkout" element={<Checkout />} />
         <Route path="/products/:id" element={<Product />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/about" element={<About />} />
